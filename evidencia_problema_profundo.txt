@@ -1,0 +1,40 @@
+EVIDENCIA DE PROBLEMA MÁS PROFUNDO
+
+Implementé los logs de debug que sugeriste pero NO aparecen en la salida:
+
+LOGS AGREGADOS AL ARCHIVO:
+```python
+import logging
+logger = logging.getLogger(__name__)
+logger.info("✅ Estrategia REAL de usuario cargada: LiquidationHunterFreq ✅")
+logger.info(f"✅ STOPLOSS definido en clase: {stoploss}")
+logger.info(f"✅ MINIMAL ROI definido en clase: {minimal_roi}")
+```
+
+RESULTADO:
+- Los logs NO aparecen en la salida del backtest
+- Freqtrade sigue mostrando valores del template: stoploss: -0.1, minimal_roi: {'60': 0.01, '30': 0.02, '0': 0.04}
+
+CONFIRMACIÓN:
+- Freqtrade dice que carga: "Using resolved strategy LiquidationHunterFreq from 'C:\Mis_Proyectos\BOT Trading\freqtrade\user_data\strategies\LiquidationHunterFreq.py'"
+- Pero nuestros logs de debug NO se ejecutan
+- Los valores mostrados son exactamente los del template sample_strategy.py
+
+ANÁLISIS:
+1. Freqtrade carga el archivo correcto
+2. Pero NO ejecuta nuestro código (los logs no aparecen)
+3. Usa valores del template en lugar de los nuestros
+4. No hay valores del template en nuestro archivo (verificado con grep)
+
+PREGUNTA:
+¿Por qué Freqtrade no ejecuta nuestro código aunque dice que carga nuestro archivo?
+
+¿Hay algún problema con:
+- La herencia de IStrategy?
+- El orden de carga de la clase?
+- Algún problema con la versión de Freqtrade?
+- Algún cache o configuración oculta?
+- Algún problema con la sintaxis del archivo?
+
+Los valores que muestra son exactamente los del template, no los nuestros, y nuestros logs de debug no se ejecutan.
+

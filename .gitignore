@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Trading specific
+*.log
+*.sqlite
+*.db
+user_data/logs/
+user_data/trades.sqlite
+user_data/backtest_results/
+user_data/plots/
+
+# Data files (keep structure but not actual data)
+data/*.csv
+!data/.gitkeep
+
+# Config files with sensitive data
+configs/*_live.json
+configs/*_production.json
+*.key
+*.secret
+
+# Reports and outputs
+reports/*.html
+reports/*.pdf
+reports/*.png
+reports/*.jpg
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

@@ -1,0 +1,62 @@
+PROBLEMA PERSISTE DESPUÉS DE IMPLEMENTAR TU CORRECCIÓN
+
+Hola, implementé exactamente tu corrección pero el problema persiste. Aquí están los detalles:
+
+CAMBIOS APLICADOS SEGÚN TU RECOMENDACIÓN:
+✅ Eliminé bot_start() completamente
+✅ Eliminé custom_exit() completamente  
+✅ Mantuve valores estáticos correctos:
+   - stoploss = -0.03
+   - minimal_roi = {"0": 0.06}
+✅ Eliminé el archivo duplicado LiquidationHunterFreq_1h.py
+
+EVIDENCIA DE QUE EL PROBLEMA PERSISTE:
+
+LOGS DE FREQTRADE (líneas 548-551):
+```
+Strategy using minimal_roi: {'60': 0.01, '30': 0.02, '0': 0.04}
+Strategy using stoploss: -0.1
+```
+
+RESULTADOS IDÉNTICOS AL ANTERIOR:
+- Pérdida promedio: -10.18% (vs -3% configurado)
+- Ganancia promedio: +1.0% (vs +6% configurado)  
+- Risk/Reward: 1:10.18 (extremadamente desfavorable)
+
+CONFIRMACIÓN DE QUE FREQTRADE CARGA EL ARCHIVO CORRECTO:
+```
+Using resolved strategy LiquidationHunterFreq from 'C:\Mis_Proyectos\BOT Trading\freqtrade\user_data\strategies\LiquidationHunterFreq.py'
+```
+
+ANÁLISIS:
+1. Freqtrade carga correctamente nuestra estrategia
+2. No hay archivos duplicados
+3. No hay custom_exit() interfiriendo
+4. No hay bot_start() forzando valores
+5. PERO Freqtrade sigue usando valores del template sample_strategy.py
+
+PREGUNTA:
+¿Por qué Freqtrade ignora completamente los valores stoploss = -0.03 y minimal_roi = {"0": 0.06} definidos en nuestra estrategia y usa en su lugar los valores por defecto del template?
+
+¿Hay algún problema más profundo con:
+- La herencia de IStrategy?
+- El orden de carga de parámetros?
+- Algún archivo de configuración por defecto?
+- La versión de Freqtrade?
+- Algún cache o configuración oculta?
+
+Los valores que muestra Freqtrade ('60': 0.01, '30': 0.02, '0': 0.04 y stoploss: -0.1) son exactamente los del template sample_strategy.py, no los nuestros.
+
+¿Qué más puede estar causando esto?
+
+INFORMACIÓN ADICIONAL:
+- Freqtrade version: 2025.10-dev-923f687a33
+- Python version: 3.11
+- OS: Windows 10
+- Comando: python -m freqtrade backtesting --strategy LiquidationHunterFreq --config config_eth.json --timerange 20250409-20251009 --cache none -v
+
+ARCHIVOS RELEVANTES:
+- Estrategia: user_data/strategies/LiquidationHunterFreq.py
+- Config: config_eth.json
+- Template: freqtrade/freqtrade/templates/sample_strategy.py
+

@@ -1,0 +1,11 @@
+{
+  "symbol": "ETH/USDT",
+  "data_file": "data/ETHUSDT_15min.csv",
+  "timeframe": "15m",
+  "commission": 0.001,
+  "initial_cash": 10000,
+  "rsi_period": 14,
+  "stop_loss": 0.03,
+  "take_profit": 0.06,
+  "position_size": 0.95
+}
