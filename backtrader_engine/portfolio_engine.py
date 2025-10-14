@@ -16,6 +16,8 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
+from monitoring.logger import get_monitoring_logger
+
 # Importar todas las estrategias
 from strategies.volatility_breakout import VolatilityBreakoutStrategy
 from strategies.bollinger_reversion import BollingerReversionStrategy
@@ -73,6 +75,7 @@ class PortfolioEngine:
         self.allocation_history = {}
         self.equity_curves = {}
         self.hybrid_logger = None
+        self.monitoring_logger = get_monitoring_logger("portfolio_engine")
         
         if enable_regime_detection:
             print("🎯 Market Regime Detection ENABLED")
@@ -593,6 +596,7 @@ class PortfolioEngine:
         print("=" * 80)
         
         portfolio_results = {}
+        self.monitoring_logger.info("Starting portfolio run for symbols: %s", symbols)
         
         for symbol in symbols:
             print(f"\n📈 PROCESSING {symbol}")
@@ -682,7 +686,81 @@ class PortfolioEngine:
             
             portfolio_results[symbol] = symbol_results
         
+        self._last_portfolio_metrics = portfolio_results
         return portfolio_results
+
+    def get_monitoring_snapshot(self) -> Dict[str, Any]:
+        strategies_snapshot = []
+        portfolio_snapshot = {}
+
+        results = getattr(self, "_last_portfolio_metrics", {})
+
+        for symbol, symbol_results in results.items():
+            if not isinstance(symbol_results, dict):
+                continue
+
+            portfolio_total = symbol_results.get("PortfolioTotal")
+            if isinstance(portfolio_total, dict) and "error" not in portfolio_total:
+                equity = 0.0
+                final_value = portfolio_total.get("total_value")
+                if final_value is None:
+                    final_value = sum(
+                        data.get("performance", {}).get("final_value", 0.0)
+                        for name, data in symbol_results.items()
+                        if name != "PortfolioTotal" and isinstance(data, dict)
+                    )
+                equity = final_value
+
+                portfolio_snapshot[symbol] = {
+                    "portfolio_type": symbol,
+                    "bot_type": "crypto",
+                    "equity": equity,
+                    "drawdown": portfolio_total.get("max_drawdown"),
+                }
+
+            for strategy_name, data in symbol_results.items():
+                if strategy_name == "PortfolioTotal" or not isinstance(data, dict):
+                    continue
+                performance = data.get("performance", {})
+                analyzers = data.get("analyzers", {})
+                trades_info = analyzers.get("trades", {})
+                trades = trades_info.get("total", {}).get("total")
+                win_rate = 0.0
+                if trades:
+                    won = trades_info.get("won", {}).get("total", 0)
+                    win_rate = (won / trades) * 100
+
+                strategies_snapshot.append(
+                    {
+                        "strategy_id": strategy_name,
+                        "asset": symbol,
+                        "portfolio_type": symbol,
+                        "bot_type": "crypto",
+                        "trades": trades or 0,
+                        "win_rate": win_rate,
+                        "pnl": performance.get("total_return", 0.0),
+                        "trades_increment": 0,
+                    }
+                )
+
+        latest_regime = None
+        if self.regime_history:
+            symbol = next(iter(self.regime_history))
+            history = self.regime_history[symbol]
+            if history:
+                latest = history[-1]
+                latest_regime = {
+                    "state": latest.get("regime"),
+                    "volatility": latest.get("vol_bucket"),
+                    "bot_type": "crypto",
+                }
+
+        return {
+            "portfolio": portfolio_snapshot,
+            "strategies": strategies_snapshot,
+            "regime": latest_regime,
+            "bot_type": "crypto",
+        }
 
     def calculate_portfolio_metrics(self, symbol_results: Dict[str, Any]) -> Dict[str, Any]:
         """Calculate portfolio-level metrics"""

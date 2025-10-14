@@ -6,6 +6,13 @@ from dotenv import load_dotenv
 import os
 from typing import Dict, Any
 
+import yaml
+
+MONITORING_CONFIG_PATH = os.getenv(
+    "MONITORING_CONFIG_PATH",
+    os.path.join(os.path.dirname(__file__), "configs", "monitoring_config.yaml"),
+)
+
 load_dotenv()
 
 class Config:
@@ -140,3 +147,37 @@ class Config:
         """Validate configuration - required by main.py"""
         errors = self.validate_critical_config()
         return len(errors) == 0
+
+
+def load_monitoring_config(env: str = "development") -> Dict[str, Any]:
+    """Load monitoring configuration for the specified environment."""
+    if not os.path.exists(MONITORING_CONFIG_PATH):
+        raise FileNotFoundError(
+            f"Monitoring config not found at {MONITORING_CONFIG_PATH}."
+        )
+
+    with open(MONITORING_CONFIG_PATH, "r", encoding="utf-8") as cfg_file:
+        config = yaml.safe_load(cfg_file)
+
+    monitoring = config.get("monitoring", {})
+    if env not in monitoring:
+        raise KeyError(f"Environment '{env}' not defined in monitoring config")
+
+    merged = monitoring[env].copy()
+
+    def _resolve(value):
+        if isinstance(value, str) and value.startswith("${") and value.endswith("}"):
+            env_key = value[2:-1]
+            return os.getenv(env_key)
+        if isinstance(value, list):
+            return [_resolve(item) for item in value]
+        if isinstance(value, dict):
+            return {k: _resolve(v) for k, v in value.items()}
+        return value
+
+    merged = _resolve(merged)
+
+    return {
+        "environment": env,
+        **merged,
+    }

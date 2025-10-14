@@ -1,0 +1,29 @@
+groups:
+  - name: trading-bot-alerts
+    rules:
+      - alert: HighDrawdown
+        expr: portfolio_drawdown{portfolio_type="portfolio_total"} > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Drawdown above threshold"
+          description: "Portfolio drawdown has exceeded 1% for more than 5 minutes."
+
+      - alert: LowWinRate
+        expr: strategy_win_rate < 45
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Strategy win rate below threshold"
+          description: "A strategy win rate has dropped below 45% for 10 minutes."
+
+      - alert: MetricsExporterDown
+        expr: up{job="trading_bots"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Metrics exporter is down"
+          description: "Prometheus cannot reach the trading bot metrics endpoint."

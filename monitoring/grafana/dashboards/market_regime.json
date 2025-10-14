@@ -1,0 +1,36 @@
+{
+  "id": null,
+  "title": "Market Regime",
+  "schemaVersion": 37,
+  "version": 1,
+  "refresh": "1m",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Current Regime",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 6},
+      "targets": [
+        {
+          "expr": "market_regime",
+          "legendFormat": "{{regime_type}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "bargauge",
+      "title": "Regime Distribution",
+      "gridPos": {"x": 6, "y": 0, "w": 18, "h": 6},
+      "targets": [
+        {
+          "expr": "avg_over_time(market_regime[6h])",
+          "legendFormat": "{{regime_type}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": []
+  }
+}

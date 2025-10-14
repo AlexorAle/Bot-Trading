@@ -1,0 +1,45 @@
+{
+  "id": null,
+  "title": "Strategy Performance",
+  "schemaVersion": 37,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Strategy Win Rate",
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 8},
+      "targets": [
+        {
+          "expr": "strategy_win_rate",
+          "legendFormat": "{{strategy_id}} - {{asset}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Strategy PnL",
+      "gridPos": {"x": 0, "y": 8, "w": 24, "h": 8},
+      "targets": [
+        {
+          "expr": "strategy_profit_loss",
+          "legendFormat": "{{strategy_id}} - {{asset}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "bargauge",
+      "title": "Trades Count",
+      "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "increase(strategy_trades_total[1h])",
+          "legendFormat": "{{strategy_id}} - {{asset}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

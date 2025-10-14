@@ -8,9 +8,10 @@ import backtrader as bt
 import pandas as pd
 import json
 import argparse
+import os
 import sys
-import importlib
 from pathlib import Path
+
 from strategies.liquidation_hunter import LiquidationHunterStrategy
 from strategies.simple_test import SimpleTestStrategy
 from strategies.ema_breakout import EMABreakoutStrategy
@@ -21,6 +22,11 @@ from strategies.bollinger_reversion import BollingerReversionStrategy
 from strategies.rsi_ema_momentum import RSIEMAMomentumStrategy
 from strategies.contrarian_volume import ContrarianVolumeSpikeStrategy
 from strategies.trend_following_adx_ema import TrendFollowingADXEMAStrategy
+
+from monitoring.metrics_server import MetricsServer
+from monitoring.log_metrics_updater import LogMetricsUpdater
+from monitoring.bot_monitor import BotMonitor
+from config import load_monitoring_config
 
 
 class PandasData(bt.feeds.PandasData):
@@ -93,7 +99,7 @@ def load_data(data_file, start_date=None, end_date=None):
         sys.exit(1)
 
 
-def run_backtest(config):
+def run_backtest(config, monitoring_snapshot_callback=None):
     """Run backtest with given configuration"""
     print(f"\n🚀 Starting backtest for {config['symbol']}")
     print("=" * 50)
@@ -293,6 +299,12 @@ def run_backtest(config):
     except Exception as e:
         print(f"⚠️  Plot generation failed: {e}")
     
+    if callable(monitoring_snapshot_callback):
+        try:
+            monitoring_snapshot_callback()
+        except Exception as exc:
+            print(f"⚠️ Monitoring callback failed: {exc}")
+
     return results
 
 
@@ -353,10 +365,53 @@ def main():
     config_path = Path(__file__).parent / args.config
     config = load_config(config_path)
     
-    # Run backtest
-    results = run_backtest(config)
+    monitoring_env = os.getenv("MONITORING_ENV", "development")
+    try:
+        monitoring_config = load_monitoring_config(env=monitoring_env)
+    except Exception as exc:
+        print(f"⚠️ Monitoring config load failed: {exc}")
+        monitoring_config = None
+    metrics_server = None
+    log_updater = None
+    bot_monitor = None
+
+    if monitoring_config:
+        try:
+            log_updater = LogMetricsUpdater(
+                directories=monitoring_config.get("log_directories", []),
+                bot_types=monitoring_config.get("bot_types", ["crypto"]),
+            )
+
+            metrics_server = MetricsServer(monitoring_config)
+            metrics_server.set_log_updater(log_updater)
+            metrics_server.start()
+
+            bot_monitor = BotMonitor()
+            bot_monitor.start_monitoring(metrics_server)
+
+        except Exception as exc:
+            print(f"⚠️ Monitoring setup failed: {exc}")
+            metrics_server = None
+            log_updater = None
+            bot_monitor = None
+
+    results = run_backtest(
+        config,
+        monitoring_snapshot_callback=(
+            lambda: metrics_server._update_metrics_from_snapshot(
+                log_updater.collect_snapshot()
+            )
+            if metrics_server and log_updater
+            else None
+        ),
+    )
     
     print("\n✅ Backtest completed successfully!")
+
+    if metrics_server:
+        metrics_server.stop()
+    if bot_monitor:
+        bot_monitor.stop_monitoring()
 
 
 if __name__ == '__main__':

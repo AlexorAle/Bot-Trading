@@ -1,0 +1,65 @@
+{
+  "id": null,
+  "title": "Portfolio Overview",
+  "tags": ["trading", "portfolio"],
+  "timezone": "browser",
+  "schemaVersion": 37,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Equity Curve",
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 9},
+      "targets": [
+        {
+          "expr": "portfolio_equity_total",
+          "legendFormat": "{{portfolio_type}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Current Drawdown",
+      "gridPos": {"x": 0, "y": 9, "w": 6, "h": 6},
+      "targets": [
+        {
+          "expr": "max(portfolio_drawdown)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Portfolio Win Rate",
+      "gridPos": {"x": 6, "y": 9, "w": 6, "h": 6},
+      "targets": [
+        {
+          "expr": "avg(strategy_win_rate)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Strategy Performance",
+      "gridPos": {"x": 12, "y": 9, "w": 12, "h": 12},
+      "targets": [
+        {
+          "expr": "strategy_profit_loss",
+          "format": "table",
+          "refId": "A"
+        },
+        {
+          "expr": "strategy_win_rate",
+          "format": "table",
+          "refId": "B"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": []
+  }
+}
