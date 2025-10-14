@@ -76,3 +76,4 @@ class EMABreakoutStrategy(bt.Strategy):
                 elif self.data.close[0] <= self.entry_price * (1 - self.p.stop_loss):
                     self.order = self.close()
                     self.log(f'STOP LOSS - Price: {self.data.close[0]:.2f}')
+

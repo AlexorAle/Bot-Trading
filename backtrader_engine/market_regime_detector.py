@@ -351,3 +351,4 @@ def test_regime_detector():
 
 if __name__ == "__main__":
     test_regime_detector()
+

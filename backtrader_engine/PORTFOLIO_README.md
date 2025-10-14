@@ -174,3 +174,4 @@ El motor genera un reporte JSON con:
 - Backtrader Documentation: https://www.backtrader.com/docu/
 - "Building Winning Algorithmic Trading Systems" – Kevin Davey
 - GitHub repos: btgym, quantdom
+

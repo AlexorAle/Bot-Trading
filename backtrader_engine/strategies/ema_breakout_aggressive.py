@@ -110,3 +110,4 @@ class EMABreakoutAggressiveStrategy(bt.Strategy):
                     elif self.data.close[0] >= self.entry_price * (1 + self.p.stop_loss):
                         self.log(f'STOP LOSS - Price: {self.data.close[0]:.2f}')
                         self.order = self.close()
+
