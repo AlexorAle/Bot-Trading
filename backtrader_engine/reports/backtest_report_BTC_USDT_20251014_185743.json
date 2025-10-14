@@ -1,0 +1,180 @@
+{
+  "config": {
+    "strategy": "VolatilityBreakoutStrategy",
+    "symbol": "BTC/USDT",
+    "data_file": "data/BTCUSDT_15min.csv",
+    "timeframe": "15m",
+    "commission": 0.001,
+    "initial_cash": 10000,
+    "lookback": 24,
+    "atr_period": 14,
+    "multiplier": 2.8,
+    "trailing_stop": 0.035,
+    "position_size": 0.08,
+    "disable_shorts_above_ema200d": true,
+    "disable_all_shorts": true,
+    "start_date": "2023-10-01",
+    "end_date": "2025-10-01"
+  },
+  "performance": {
+    "initial_cash": 10000,
+    "final_value": 10466.383512040738,
+    "total_return": 4.663835120407384
+  },
+  "analyzers": {
+    "sharpe": {
+      "sharperatio": 3.1985074179000375
+    },
+    "drawdown": {
+      "len": 7554,
+      "drawdown": 1.019773379887591,
+      "moneydown": 107.833045586347,
+      "max": {
+        "len": 47227,
+        "drawdown": 4.592515081891594,
+        "moneydown": 484.0513487338703
+      }
+    },
+    "returns": {
+      "rtot": 0.045583457896375155,
+      "ravg": 6.227248346499338e-05,
+      "rnorm": 0.01581644232712293,
+      "rnorm100": 1.581644232712293
+    },
+    "trades": {
+      "total": {
+        "total": 172,
+        "open": 1,
+        "closed": 171
+      },
+      "streak": {
+        "won": {
+          "current": 0,
+          "longest": 4
+        },
+        "lost": {
+          "current": 1,
+          "longest": 7
+        }
+      },
+      "pnl": {
+        "gross": {
+          "total": 719.4083204097169,
+          "average": 4.207066201226414
+        },
+        "net": {
+          "total": 437.1812026256,
+          "average": 2.5566152200327488
+        }
+      },
+      "won": {
+        "total": 65,
+        "pnl": {
+          "total": 2587.920206067779,
+          "average": 39.814157016427366,
+          "max": 202.76299089685725
+        }
+      },
+      "lost": {
+        "total": 106,
+        "pnl": {
+          "total": -2150.73900344218,
+          "average": -20.28999059851113,
+          "max": -36.72653207308159
+        }
+      },
+      "long": {
+        "total": 171,
+        "pnl": {
+          "total": 437.1812026256,
+          "average": 2.5566152200327488,
+          "won": {
+            "total": 2587.920206067779,
+            "average": 39.814157016427366,
+            "max": 202.76299089685725
+          },
+          "lost": {
+            "total": -2150.73900344218,
+            "average": -20.28999059851113,
+            "max": -36.72653207308159
+          }
+        },
+        "won": 65,
+        "lost": 106
+      },
+      "short": {
+        "total": 0,
+        "pnl": {
+          "total": 0.0,
+          "average": 0.0,
+          "won": {
+            "total": 0.0,
+            "average": 0.0,
+            "max": 0.0
+          },
+          "lost": {
+            "total": 0.0,
+            "average": 0.0,
+            "max": 0.0
+          }
+        },
+        "won": 0,
+        "lost": 0
+      },
+      "len": {
+        "total": 58030,
+        "average": 339.3567251461988,
+        "max": 2287,
+        "min": 12,
+        "won": {
+          "total": 36795,
+          "average": 566.0769230769231,
+          "max": 2287,
+          "min": 29
+        },
+        "lost": {
+          "total": 21235,
+          "average": 200.33018867924528,
+          "max": 645,
+          "min": 12
+        },
+        "long": {
+          "total": 58030,
+          "average": 339.3567251461988,
+          "max": 2287,
+          "min": 12,
+          "won": {
+            "total": 36795,
+            "average": 566.0769230769231,
+            "max": 2287,
+            "min": 29
+          },
+          "lost": {
+            "total": 21235,
+            "average": 200.33018867924528,
+            "max": 645,
+            "min": 12
+          }
+        },
+        "short": {
+          "total": 0,
+          "average": 0.0,
+          "max": 0,
+          "min": 9223372036854775807,
+          "won": {
+            "total": 0,
+            "average": 0.0,
+            "max": 0,
+            "min": 9223372036854775807
+          },
+          "lost": {
+            "total": 0,
+            "average": 0.0,
+            "max": 0,
+            "min": 9223372036854775807
+          }
+        }
+      }
+    }
+  }
+}

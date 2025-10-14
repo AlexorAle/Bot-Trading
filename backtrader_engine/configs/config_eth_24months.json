@@ -12,7 +12,6 @@
   "position_size": 0.1,
   "disable_shorts_above_ema200d": true,
   "disable_all_shorts": true,
-  "start_date": "2025-04-17",
-  "end_date": "2025-10-14"
+  "start_date": "2023-10-01",
+  "end_date": "2025-10-01"
 }
-

@@ -1,0 +1,17 @@
+{
+  "strategy": "VolatilityBreakoutStrategy",
+  "symbol": "SOL/USDT",
+  "data_file": "data/SOLUSDT_15m.csv",
+  "timeframe": "15m",
+  "commission": 0.001,
+  "initial_cash": 10000,
+  "lookback": 14,
+  "atr_period": 14,
+  "multiplier": 1.8,
+  "trailing_stop": 0.02,
+  "position_size": 0.12,
+  "disable_shorts_above_ema200d": true,
+  "disable_all_shorts": true,
+  "start_date": "2024-10-01",
+  "end_date": "2025-10-01"
+}
