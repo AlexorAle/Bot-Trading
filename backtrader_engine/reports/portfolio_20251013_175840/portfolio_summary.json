@@ -1,0 +1,21 @@
+{
+  "session_id": "20251013_175840",
+  "total_strategies": 1,
+  "total_symbols": 1,
+  "portfolio_results": {
+    "BTCUSDT": {
+      "BollingerReversionStrategy": {
+        "error": ""
+      },
+      "PortfolioTotal": {
+        "error": "No valid results to aggregate"
+      }
+    }
+  },
+  "regime_detection_enabled": false,
+  "risk_parity_enabled": true,
+  "strategy_handle_enabled": true,
+  "end_time": "2025-10-13T17:58:49.210626",
+  "status": "completed",
+  "last_update": "2025-10-13T17:58:49.210626"
+}

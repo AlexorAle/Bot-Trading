@@ -1,0 +1,72 @@
+{
+  "session_id": "20251013_180443",
+  "total_strategies": 1,
+  "total_symbols": 1,
+  "portfolio_results": {
+    "BTCUSDT": {
+      "RSIEMAMomentumStrategy": {
+        "config": {
+          "strategy": "RSIEMAMomentumStrategy",
+          "symbol": "BTCUSDT",
+          "data_file": "data/BTCUSDT_15min.csv",
+          "timeframe": "15m",
+          "commission": 0.001,
+          "initial_cash": 10000,
+          "rsi_period": 14,
+          "rsi_buy_threshold": 40,
+          "rsi_sell_threshold": 60,
+          "ema_period": 20,
+          "position_size": 0.15,
+          "take_profit": 0.02,
+          "stop_loss": 0.01,
+          "start_date": "2025-04-01",
+          "end_date": "2025-10-09"
+        },
+        "performance": {
+          "initial_cash": 10000,
+          "final_value": 10000.0,
+          "total_return": 0.0
+        },
+        "analyzers": {
+          "sharpe": {
+            "sharperatio": null
+          },
+          "drawdown": {
+            "len": 0,
+            "drawdown": 0.0,
+            "moneydown": 0.0,
+            "max": {
+              "len": 0.0,
+              "drawdown": 0.0,
+              "moneydown": 0.0
+            }
+          },
+          "returns": {
+            "rtot": 0.0,
+            "ravg": 0.0,
+            "rnorm": 0.0,
+            "rnorm100": 0.0
+          },
+          "trades": {
+            "total": {
+              "total": 0
+            }
+          }
+        }
+      },
+      "PortfolioTotal": {
+        "total_return": 0.0,
+        "max_drawdown": 0.0,
+        "total_trades": 0,
+        "win_rate": 0,
+        "strategies_count": 1
+      }
+    }
+  },
+  "regime_detection_enabled": false,
+  "risk_parity_enabled": true,
+  "strategy_handle_enabled": true,
+  "end_time": "2025-10-13T18:04:56.461166",
+  "status": "completed",
+  "last_update": "2025-10-13T18:04:56.461166"
+}

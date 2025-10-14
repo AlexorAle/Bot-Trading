@@ -1,0 +1,51 @@
+{
+  "config": {
+    "strategy": "RSIEMAMomentumStrategy",
+    "symbol": "BTC/USDT",
+    "data_file": "data/BTCUSDT_15min.csv",
+    "timeframe": "15m",
+    "commission": 0.001,
+    "initial_cash": 10000,
+    "rsi_period": 14,
+    "rsi_buy_threshold": 60,
+    "rsi_sell_threshold": 40,
+    "ema_period": 20,
+    "position_size": 0.15,
+    "take_profit": 0.02,
+    "stop_loss": 0.01,
+    "start_date": "2025-09-25",
+    "end_date": "2025-10-09"
+  },
+  "performance": {
+    "initial_cash": 10000,
+    "final_value": 9849.308879303124,
+    "total_return": -1.5069112069687618
+  },
+  "analyzers": {
+    "sharpe": {
+      "sharperatio": null
+    },
+    "drawdown": {
+      "len": 1203,
+      "drawdown": 1.9173638038184275,
+      "moneydown": 192.538751711676,
+      "max": {
+        "len": 1203,
+        "drawdown": 2.303219768273211,
+        "moneydown": 231.28581973740802
+      }
+    },
+    "returns": {
+      "rtot": -0.015183804809448446,
+      "ravg": -0.0010122536539632298,
+      "rnorm": -0.22515163032138147,
+      "rnorm100": -22.515163032138148
+    },
+    "trades": {
+      "total": {
+        "total": 1,
+        "open": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "BTCUSDT": {
+    "VolatilityBreakoutStrategy": {
+      "error": "Strategy disabled by regime detection",
+      "regime": "DISABLED"
+    },
+    "PortfolioTotal": {
+      "error": "No valid results to aggregate"
+    }
+  }
+}

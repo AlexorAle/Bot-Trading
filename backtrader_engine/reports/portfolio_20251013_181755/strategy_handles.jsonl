@@ -1,0 +1,6 @@
+{"timestamp": "2025-10-13T18:17:55.559519", "type": "strategy_handle", "strategy_name": "VolatilityBreakoutStrategy", "action": "ENABLED", "data": {"equity": 10000.0, "action": "ENABLED", "strategy_idx": 0, "params": {}}}
+{"timestamp": "2025-10-13T18:17:55.561504", "type": "strategy_handle", "strategy_name": "BollingerReversionStrategy", "action": "ENABLED", "data": {"equity": 10000.0, "action": "ENABLED", "strategy_idx": 0, "params": {}}}
+{"timestamp": "2025-10-13T18:17:55.564590", "type": "strategy_handle", "strategy_name": "RSIEMAMomentumStrategy", "action": "ENABLED", "data": {"equity": 10000.0, "action": "ENABLED", "strategy_idx": 0, "params": {}}}
+{"timestamp": "2025-10-13T18:17:55.568750", "type": "strategy_handle", "strategy_name": "EMABreakoutConservativeStrategy", "action": "ENABLED", "data": {"equity": 10000.0, "action": "ENABLED", "strategy_idx": 0, "params": {}}}
+{"timestamp": "2025-10-13T18:17:55.574953", "type": "strategy_handle", "strategy_name": "ContrarianVolumeSpikeStrategy", "action": "ENABLED", "data": {"equity": 10000.0, "action": "ENABLED", "strategy_idx": 0, "params": {}}}
+{"timestamp": "2025-10-13T18:17:55.578700", "type": "strategy_handle", "strategy_name": "TrendFollowingADXEMAStrategy", "action": "ENABLED", "data": {"equity": 10000.0, "action": "ENABLED", "strategy_idx": 0, "params": {}}}

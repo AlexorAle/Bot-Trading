@@ -1,0 +1,2 @@
+{"timestamp": "2025-10-13T17:12:51.343433", "type": "strategy_handle", "strategy_name": "EMABreakoutConservativeStrategy", "action": "ENABLED", "data": {"equity": 10000.0, "action": "ENABLED", "strategy_idx": 0, "params": {}}}
+{"timestamp": "2025-10-13T17:12:51.350786", "type": "strategy_handle", "strategy_name": "ContrarianVolumeSpikeStrategy", "action": "ENABLED", "data": {"equity": 10000.0, "action": "ENABLED", "strategy_idx": 0, "params": {}}}

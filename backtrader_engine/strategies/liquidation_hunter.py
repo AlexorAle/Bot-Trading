@@ -125,25 +125,36 @@ class LiquidationHunterStrategy(bt.Strategy):
             self.ml_confidence = 0.6
     
     def check_entry_conditions(self):
-        """Check if entry conditions are met"""
+        """Check if entry conditions are met with trend filter"""
         # Calculate ML prediction
         self.calculate_ml_prediction()
         
         # Get current values
         kalman_signal = abs(self.kalman_signal[0])
         kalman_deviation = self.kalman_deviation[0]
+        rsi_val = self.rsi[0]
         
         # Strategy conditions
         strong_kalman = kalman_signal > self.params.kalman_threshold
         high_deviation = kalman_deviation > self.params.deviation_threshold
         high_confidence = self.ml_confidence > self.params.ml_confidence_threshold
         
+        # TREND FILTER: RSI-based direction filter
+        trend_filter_long = rsi_val > 50  # Only allow longs when RSI > 50
+        trend_filter_short = rsi_val < 50  # Only allow shorts when RSI < 50
+        
         # Volume check (if available)
         volume_ok = True
         if hasattr(self.data, 'volume'):
             volume_ok = self.data.volume[0] > 0
         
-        return strong_kalman and high_deviation and high_confidence and volume_ok
+        # Apply trend filter based on ML prediction
+        if self.ml_prediction == 1:  # Long signal
+            return strong_kalman and high_deviation and high_confidence and volume_ok and trend_filter_long
+        elif self.ml_prediction == 0:  # Short signal
+            return strong_kalman and high_deviation and high_confidence and volume_ok and trend_filter_short
+        
+        return False
     
     def next(self):
         """Main strategy logic executed on each bar"""
@@ -187,12 +198,14 @@ class LiquidationHunterStrategy(bt.Strategy):
         
         # Exit logic for short positions
         elif position < 0:  # Short position
+            # Use sell price for short positions
+            sell_price = self.buy_price if self.buy_price else self.data.close[0]
             # Take profit
-            if self.data.close[0] <= self.buy_price * (1 - self.params.take_profit):
+            if self.data.close[0] <= sell_price * (1 - self.params.take_profit):
                 self.log(f'TAKE PROFIT - Price: {self.data.close[0]:.2f}')
                 self.order = self.buy(size=abs(position))
             # Stop loss
-            elif self.data.close[0] >= self.buy_price * (1 + self.params.stop_loss):
+            elif self.data.close[0] >= sell_price * (1 + self.params.stop_loss):
                 self.log(f'STOP LOSS - Price: {self.data.close[0]:.2f}')
                 self.order = self.buy(size=abs(position))
             # Exit signal

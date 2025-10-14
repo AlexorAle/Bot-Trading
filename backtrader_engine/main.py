@@ -9,9 +9,18 @@ import pandas as pd
 import json
 import argparse
 import sys
+import importlib
 from pathlib import Path
 from strategies.liquidation_hunter import LiquidationHunterStrategy
 from strategies.simple_test import SimpleTestStrategy
+from strategies.ema_breakout import EMABreakoutStrategy
+from strategies.ema_breakout_conservative import EMABreakoutConservativeStrategy
+from strategies.ema_breakout_aggressive import EMABreakoutAggressiveStrategy
+from strategies.volatility_breakout import VolatilityBreakoutStrategy
+from strategies.bollinger_reversion import BollingerReversionStrategy
+from strategies.rsi_ema_momentum import RSIEMAMomentumStrategy
+from strategies.contrarian_volume import ContrarianVolumeSpikeStrategy
+from strategies.trend_following_adx_ema import TrendFollowingADXEMAStrategy
 
 
 class PandasData(bt.feeds.PandasData):
@@ -39,7 +48,7 @@ def load_config(config_path):
         sys.exit(1)
 
 
-def load_data(data_file):
+def load_data(data_file, start_date=None, end_date=None):
     """Load and prepare data from CSV file"""
     try:
         # Read CSV file
@@ -56,6 +65,14 @@ def load_data(data_file):
         
         # Set datetime as index
         df.set_index('datetime', inplace=True)
+        
+        # Filter by date range if specified
+        if start_date:
+            df = df[df.index >= start_date]
+            print(f"📅 Filtered from {start_date}")
+        if end_date:
+            df = df[df.index <= end_date]
+            print(f"📅 Filtered to {end_date}")
         
         # Ensure required columns exist
         required_columns = ['open', 'high', 'low', 'close']
@@ -86,14 +103,97 @@ def run_backtest(config):
     
     # Load data
     data_path = Path(__file__).parent / config['data_file']
-    df = load_data(data_path)
+    start_date = config.get('start_date')
+    end_date = config.get('end_date')
+    df = load_data(data_path, start_date, end_date)
     
     # Create data feed
     data_feed = PandasData(dataname=df)
     cerebro.adddata(data_feed)
     
-    # Add strategy with parameters
-    if 'kalman_threshold' in config:
+    # Add strategy with parameters - Dynamic strategy loading
+    strategy_name = config.get('strategy', 'LiquidationHunterStrategy')
+    
+    if strategy_name == 'EMABreakoutConservativeStrategy':
+        # Conservative EMA Breakout with filters
+        cerebro.addstrategy(EMABreakoutConservativeStrategy,
+                           ema_fast=config['ema_fast'],
+                           ema_slow=config['ema_slow'],
+                           take_profit=config['take_profit'],
+                           stop_loss=config['stop_loss'],
+                           position_size=config['position_size'],
+                           volatility_threshold=config['volatility_threshold'],
+                           trend_ema_fast=config['trend_ema_fast'],
+                           trend_ema_slow=config['trend_ema_slow'])
+    elif strategy_name == 'EMABreakoutAggressiveStrategy':
+        # Aggressive EMA Breakout with filters
+        cerebro.addstrategy(EMABreakoutAggressiveStrategy,
+                           ema_fast=config['ema_fast'],
+                           ema_slow=config['ema_slow'],
+                           take_profit=config['take_profit'],
+                           stop_loss=config['stop_loss'],
+                           position_size=config['position_size'],
+                           volatility_threshold=config['volatility_threshold'],
+                           volume_period=config['volume_period'],
+                           trend_ema_fast=config['trend_ema_fast'],
+                           trend_ema_slow=config['trend_ema_slow'])
+    elif strategy_name == 'EMABreakoutStrategy':
+        # EMA Breakout Strategy
+        cerebro.addstrategy(EMABreakoutStrategy,
+                           ema_fast=config['ema_fast'],
+                           ema_slow=config['ema_slow'],
+                           take_profit=config['take_profit'],
+                           stop_loss=config['stop_loss'],
+                           position_size=config['position_size'])
+    elif strategy_name == 'VolatilityBreakoutStrategy':
+        # Volatility Breakout Strategy
+        cerebro.addstrategy(VolatilityBreakoutStrategy,
+                           lookback=config['lookback'],
+                           atr_period=config['atr_period'],
+                           multiplier=config['multiplier'],
+                           trailing_stop=config['trailing_stop'],
+                           position_size=config['position_size'])
+    elif strategy_name == 'BollingerReversionStrategy':
+        # Bollinger Bands Reversion Strategy
+        cerebro.addstrategy(BollingerReversionStrategy,
+                           bb_period=config['bb_period'],
+                           std_dev=config['std_dev'],
+                           volume_filter_period=config['volume_filter_period'],
+                           position_size=config['position_size'],
+                           take_profit=config['take_profit'],
+                           stop_loss=config['stop_loss'])
+    elif strategy_name == 'RSIEMAMomentumStrategy':
+        # RSI + EMA Momentum Strategy
+        cerebro.addstrategy(RSIEMAMomentumStrategy,
+                           rsi_period=config['rsi_period'],
+                           rsi_buy_threshold=config['rsi_buy_threshold'],
+                           rsi_sell_threshold=config['rsi_sell_threshold'],
+                           ema_period=config['ema_period'],
+                           position_size=config['position_size'],
+                           take_profit=config['take_profit'],
+                           stop_loss=config['stop_loss'])
+    elif strategy_name == 'ContrarianVolumeSpikeStrategy':
+        # Contrarian Volume Spike Strategy
+        cerebro.addstrategy(ContrarianVolumeSpikeStrategy,
+                           volume_period=config['volume_period'],
+                           volume_spike_multiplier=config['volume_spike_multiplier'],
+                           spread_threshold=config['spread_threshold'],
+                           position_size=config['position_size'],
+                           stop_loss=config['stop_loss'],
+                           take_profit=config['take_profit'],
+                           rsi_period=config['rsi_period'])
+    elif strategy_name == 'TrendFollowingADXEMAStrategy':
+        # Trend Following ADX + EMA Strategy
+        cerebro.addstrategy(TrendFollowingADXEMAStrategy,
+                           adx_period=config['adx_period'],
+                           adx_threshold=config['adx_threshold'],
+                           ema_fast=config['ema_fast'],
+                           ema_slow=config['ema_slow'],
+                           position_size=config['position_size'],
+                           take_profit=config['take_profit'],
+                           stop_loss=config['stop_loss'],
+                           trailing_stop=config['trailing_stop'])
+    elif 'kalman_threshold' in config:
         # Full LiquidationHunterStrategy
         cerebro.addstrategy(LiquidationHunterStrategy,
                            kalman_threshold=config['kalman_threshold'],
@@ -142,6 +242,14 @@ def run_backtest(config):
     # Get analyzer results
     strat = results[0]
     
+    # Create detailed report
+    report = generate_detailed_report(strat, config, final_value, total_return)
+    
+    # Print summary
+    print("\n" + "="*60)
+    print("📊 RESUMEN EJECUTIVO")
+    print("="*60)
+    
     # Sharpe Ratio
     sharpe = strat.analyzers.sharpe.get_analysis()
     if 'sharperatio' in sharpe and sharpe['sharperatio'] is not None:
@@ -155,10 +263,28 @@ def run_backtest(config):
     trades = strat.analyzers.trades.get_analysis()
     if 'total' in trades and trades['total']['total'] > 0:
         print(f"Total Trades: {trades['total']['total']}")
-        print(f"Winning Trades: {trades['won']['total']}")
-        print(f"Losing Trades: {trades['lost']['total']}")
-        win_rate = trades['won']['total'] / trades['total']['total'] * 100
-        print(f"Win Rate: {win_rate:.2f}%")
+        
+        # Safe access to won/lost trades
+        won_trades = trades.get('won', {}).get('total', 0)
+        lost_trades = trades.get('lost', {}).get('total', 0)
+        
+        print(f"Winning Trades: {won_trades}")
+        print(f"Losing Trades: {lost_trades}")
+        
+        if trades['total']['total'] > 0:
+            win_rate = won_trades / trades['total']['total'] * 100
+            print(f"Win Rate: {win_rate:.2f}%")
+        
+        # Additional metrics
+        if 'won' in trades and 'pnl' in trades['won']:
+            avg_win = trades['won']['pnl']['average']
+            print(f"Average Win: ${avg_win:.2f}")
+        if 'lost' in trades and 'pnl' in trades['lost']:
+            avg_loss = trades['lost']['pnl']['average']
+            print(f"Average Loss: ${avg_loss:.2f}")
+    
+    # Save detailed report
+    save_report_to_file(report, config['symbol'])
     
     # Plot results
     try:
@@ -169,6 +295,49 @@ def run_backtest(config):
     
     return results
 
+
+def generate_detailed_report(strat, config, final_value, total_return):
+    """Generate detailed trading report"""
+    report = {
+        'config': config,
+        'performance': {
+            'initial_cash': config['initial_cash'],
+            'final_value': final_value,
+            'total_return': total_return
+        },
+        'analyzers': {}
+    }
+    
+    # Collect all analyzer data
+    analyzers = ['sharpe', 'drawdown', 'returns', 'trades']
+    for analyzer_name in analyzers:
+        if hasattr(strat.analyzers, analyzer_name):
+            analyzer = getattr(strat.analyzers, analyzer_name)
+            report['analyzers'][analyzer_name] = analyzer.get_analysis()
+    
+    return report
+
+def save_report_to_file(report, symbol):
+    """Save detailed report to JSON file"""
+    import json
+    from datetime import datetime
+    
+    # Create reports directory if it doesn't exist
+    reports_dir = Path(__file__).parent / 'reports'
+    reports_dir.mkdir(exist_ok=True)
+    
+    # Generate filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    symbol_clean = symbol.replace('/', '_').replace('\\', '_')
+    filename = f"backtest_report_{symbol_clean}_{timestamp}.json"
+    filepath = reports_dir / filename
+    
+    # Save report
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(report, f, indent=2, default=str)
+    
+    print(f"\n📄 Reporte detallado guardado en: {filepath}")
+    return filepath
 
 def main():
     """Main function"""

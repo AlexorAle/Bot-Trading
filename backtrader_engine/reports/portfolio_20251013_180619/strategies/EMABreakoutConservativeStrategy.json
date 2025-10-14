@@ -1,0 +1,52 @@
+{
+  "config": {
+    "strategy": "EMABreakoutConservativeStrategy",
+    "symbol": "BTCUSDT",
+    "data_file": "data/BTCUSDT_15min.csv",
+    "timeframe": "15m",
+    "commission": 0.001,
+    "initial_cash": 10000,
+    "ema_fast": 6,
+    "ema_slow": 28,
+    "take_profit": 0.02,
+    "stop_loss": 0.0075,
+    "position_size": 0.08,
+    "volatility_threshold": 0.005,
+    "trend_ema_fast": 20,
+    "trend_ema_slow": 50,
+    "start_date": "2025-04-01",
+    "end_date": "2025-10-09"
+  },
+  "performance": {
+    "initial_cash": 10000,
+    "final_value": 9560.082654984892,
+    "total_return": -4.399173450151084
+  },
+  "analyzers": {
+    "sharpe": {
+      "sharperatio": null
+    },
+    "drawdown": {
+      "len": 17563,
+      "drawdown": 4.85096449712538,
+      "moneydown": 487.3998070901598,
+      "max": {
+        "len": 17563,
+        "drawdown": 5.140714224992994,
+        "moneydown": 516.5123601815685
+      }
+    },
+    "returns": {
+      "rtot": -0.04498872004918979,
+      "ravg": -0.0002343162502561968,
+      "rnorm": -0.05733819223089117,
+      "rnorm100": -5.733819223089117
+    },
+    "trades": {
+      "total": {
+        "total": 1,
+        "open": 1
+      }
+    }
+  }
+}

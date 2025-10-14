@@ -1,0 +1,10 @@
+{
+  "BTCUSDT": {
+    "RSIEMAMomentumStrategy": {
+      "error": ""
+    },
+    "PortfolioTotal": {
+      "error": "No valid results to aggregate"
+    }
+  }
+}

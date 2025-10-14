@@ -1,0 +1,19 @@
+{
+  "strategy": "RSIEMAMomentumStrategy",
+  "symbol": "BTC/USDT",
+  "data_file": "data/BTCUSDT_15min.csv",
+  "timeframe": "15m",
+  "commission": 0.001,
+  "initial_cash": 10000,
+  "rsi_period": 14,
+  "rsi_buy_threshold": 65,
+  "rsi_sell_threshold": 35,
+  "ema_period": 50,
+  "position_size": 0.1,
+  "take_profit": 0.03,
+  "stop_loss": 0.01,
+  "volume_filter": 1.2,
+  "cooldown_period": 10,
+  "start_date": "2025-04-01",
+  "end_date": "2025-10-09"
+}

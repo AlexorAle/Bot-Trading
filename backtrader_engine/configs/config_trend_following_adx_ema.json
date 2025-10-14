@@ -1,0 +1,18 @@
+{
+  "strategy": "TrendFollowingADXEMAStrategy",
+  "symbol": "BTC/USDT",
+  "data_file": "data/BTCUSDT_15min.csv",
+  "timeframe": "15m",
+  "commission": 0.001,
+  "initial_cash": 10000,
+  "adx_period": 14,
+  "adx_threshold": 30,
+  "ema_fast": 21,
+  "ema_slow": 55,
+  "position_size": 0.05,
+  "take_profit": 0.04,
+  "stop_loss": 0.01,
+  "trailing_stop": 0.012,
+  "start_date": "2025-04-01",
+  "end_date": "2025-10-09"
+}

@@ -1,0 +1,10 @@
+{
+  "BTCUSDT": {
+    "TrendFollowingADXEMAStrategy": {
+      "error": ""
+    },
+    "PortfolioTotal": {
+      "error": "No valid results to aggregate"
+    }
+  }
+}

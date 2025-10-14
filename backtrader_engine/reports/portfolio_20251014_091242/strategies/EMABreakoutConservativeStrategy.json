@@ -1,0 +1,180 @@
+{
+  "config": {
+    "strategy": "EMABreakoutConservativeStrategy",
+    "symbol": "BTC/USDT",
+    "data_file": "data/BTCUSDT_15min.csv",
+    "timeframe": "15m",
+    "commission": 0.001,
+    "initial_cash": 10000,
+    "ema_fast": 12,
+    "ema_slow": 24,
+    "take_profit": 0.025,
+    "stop_loss": 0.01,
+    "position_size": 0.1,
+    "volatility_threshold": 0.0025,
+    "trend_filter": false,
+    "start_date": "2025-09-25",
+    "end_date": "2025-10-09"
+  },
+  "performance": {
+    "initial_cash": 10000,
+    "final_value": 10006.073960663103,
+    "total_return": 0.06073960663103208
+  },
+  "analyzers": {
+    "sharpe": {
+      "sharperatio": null
+    },
+    "drawdown": {
+      "len": 730,
+      "drawdown": 0.18187102698701008,
+      "moneydown": 18.231306938499984,
+      "max": {
+        "len": 730,
+        "drawdown": 0.2571520169875724,
+        "moneydown": 25.77770318462899
+      }
+    },
+    "returns": {
+      "rtot": 0.0006072116759810618,
+      "ravg": 4.048077839873745e-05,
+      "rnorm": 0.010253365330236457,
+      "rnorm100": 1.0253365330236457
+    },
+    "trades": {
+      "total": {
+        "total": 3,
+        "open": 1,
+        "closed": 2
+      },
+      "streak": {
+        "won": {
+          "current": 0,
+          "longest": 1
+        },
+        "lost": {
+          "current": 1,
+          "longest": 1
+        }
+      },
+      "pnl": {
+        "gross": {
+          "total": 24.850577090045512,
+          "average": 12.425288545022756
+        },
+        "net": {
+          "total": 20.820161333257442,
+          "average": 10.410080666628721
+        }
+      },
+      "won": {
+        "total": 1,
+        "pnl": {
+          "total": 23.279874326864288,
+          "average": 23.279874326864288,
+          "max": 23.279874326864288
+        }
+      },
+      "lost": {
+        "total": 1,
+        "pnl": {
+          "total": -2.4597129936068463,
+          "average": -2.4597129936068463,
+          "max": -2.4597129936068463
+        }
+      },
+      "long": {
+        "total": 1,
+        "pnl": {
+          "total": 23.279874326864288,
+          "average": 23.279874326864288,
+          "won": {
+            "total": 23.279874326864288,
+            "average": 23.279874326864288,
+            "max": 23.279874326864288
+          },
+          "lost": {
+            "total": 0.0,
+            "average": 0.0,
+            "max": 0.0
+          }
+        },
+        "won": 1,
+        "lost": 0
+      },
+      "short": {
+        "total": 1,
+        "pnl": {
+          "total": -2.4597129936068463,
+          "average": -2.4597129936068463,
+          "won": {
+            "total": 0.0,
+            "average": 0.0,
+            "max": 0.0
+          },
+          "lost": {
+            "total": -2.4597129936068463,
+            "average": -2.4597129936068463,
+            "max": -2.4597129936068463
+          }
+        },
+        "won": 0,
+        "lost": 1
+      },
+      "len": {
+        "total": 63,
+        "average": 31.5,
+        "max": 62,
+        "min": 1,
+        "won": {
+          "total": 62,
+          "average": 62.0,
+          "max": 62,
+          "min": 62
+        },
+        "lost": {
+          "total": 1,
+          "average": 1.0,
+          "max": 1,
+          "min": 1
+        },
+        "long": {
+          "total": 62,
+          "average": 62.0,
+          "max": 62,
+          "min": 62,
+          "won": {
+            "total": 62,
+            "average": 62.0,
+            "max": 62,
+            "min": 62
+          },
+          "lost": {
+            "total": 0,
+            "average": 0.0,
+            "max": 0,
+            "min": 9223372036854775807
+          }
+        },
+        "short": {
+          "total": 1,
+          "average": 1.0,
+          "max": 1,
+          "min": 1,
+          "won": {
+            "total": 0,
+            "average": 0.0,
+            "max": 0,
+            "min": 9223372036854775807
+          },
+          "lost": {
+            "total": 1,
+            "average": 1.0,
+            "max": 1,
+            "min": 1
+          }
+        }
+      }
+    }
+  }
+}

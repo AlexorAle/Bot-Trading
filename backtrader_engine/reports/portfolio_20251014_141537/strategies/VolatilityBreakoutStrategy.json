@@ -1,0 +1,178 @@
+{
+  "config": {
+    "strategy": "VolatilityBreakoutStrategy",
+    "symbol": "BTCUSDT",
+    "data_file": "data/BTCUSDT_15min.csv",
+    "timeframe": "15m",
+    "commission": 0.001,
+    "initial_cash": 10000,
+    "lookback": 10,
+    "atr_period": 14,
+    "multiplier": 1.0,
+    "trailing_stop": 0.015,
+    "position_size": 0.1,
+    "start_date": "2025-04-01",
+    "end_date": "2025-10-09"
+  },
+  "performance": {
+    "initial_cash": 10000,
+    "final_value": 10003.82839109779,
+    "total_return": 0.038283910977897906
+  },
+  "analyzers": {
+    "sharpe": {
+      "sharperatio": null
+    },
+    "drawdown": {
+      "len": 8322,
+      "drawdown": 1.3947425766242096,
+      "moneydown": 141.50123178927424,
+      "max": {
+        "len": 8322,
+        "drawdown": 2.5378672048195052,
+        "moneydown": 257.4749933200892
+      }
+    },
+    "returns": {
+      "rtot": 0.00038276584558522426,
+      "ravg": 1.993572112423043e-06,
+      "rnorm": 0.0005025063863843101,
+      "rnorm100": 0.05025063863843101
+    },
+    "trades": {
+      "total": {
+        "total": 115,
+        "open": 1,
+        "closed": 114
+      },
+      "streak": {
+        "won": {
+          "current": 0,
+          "longest": 4
+        },
+        "lost": {
+          "current": 1,
+          "longest": 9
+        }
+      },
+      "pnl": {
+        "gross": {
+          "total": 220.9415466438088,
+          "average": 1.938083742489551
+        },
+        "net": {
+          "total": -7.342079951052842,
+          "average": -0.06440421009695475
+        }
+      },
+      "won": {
+        "total": 36,
+        "pnl": {
+          "total": 834.5461204360257,
+          "average": 23.18183667877849,
+          "max": 112.0703558328859
+        }
+      },
+      "lost": {
+        "total": 78,
+        "pnl": {
+          "total": -841.888200387079,
+          "average": -10.793438466501012,
+          "max": -23.884085910570683
+        }
+      },
+      "long": {
+        "total": 114,
+        "pnl": {
+          "total": -7.342079951052842,
+          "average": -0.06440421009695475,
+          "won": {
+            "total": 834.5461204360257,
+            "average": 23.18183667877849,
+            "max": 112.0703558328859
+          },
+          "lost": {
+            "total": -841.888200387079,
+            "average": -10.793438466501012,
+            "max": -23.884085910570683
+          }
+        },
+        "won": 36,
+        "lost": 78
+      },
+      "short": {
+        "total": 0,
+        "pnl": {
+          "total": 0.0,
+          "average": 0.0,
+          "won": {
+            "total": 0.0,
+            "average": 0.0,
+            "max": 0.0
+          },
+          "lost": {
+            "total": 0.0,
+            "average": 0.0,
+            "max": 0.0
+          }
+        },
+        "won": 0,
+        "lost": 0
+      },
+      "len": {
+        "total": 14430,
+        "average": 126.57894736842105,
+        "max": 662,
+        "min": 7,
+        "won": {
+          "total": 7839,
+          "average": 217.75,
+          "max": 662,
+          "min": 24
+        },
+        "lost": {
+          "total": 6591,
+          "average": 84.5,
+          "max": 346,
+          "min": 7
+        },
+        "long": {
+          "total": 14430,
+          "average": 126.57894736842105,
+          "max": 662,
+          "min": 7,
+          "won": {
+            "total": 7839,
+            "average": 217.75,
+            "max": 662,
+            "min": 24
+          },
+          "lost": {
+            "total": 6591,
+            "average": 84.5,
+            "max": 346,
+            "min": 7
+          }
+        },
+        "short": {
+          "total": 0,
+          "average": 0.0,
+          "max": 0,
+          "min": 9223372036854775807,
+          "won": {
+            "total": 0,
+            "average": 0.0,
+            "max": 0,
+            "min": 9223372036854775807
+          },
+          "lost": {
+            "total": 0,
+            "average": 0.0,
+            "max": 0,
+            "min": 9223372036854775807
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "strategy": "EMABreakoutAggressiveStrategy",
+  "symbol": "BTC/USDT",
+  "data_file": "data/BTCUSDT_15min.csv",
+  "timeframe": "15m",
+  "commission": 0.001,
+  "initial_cash": 10000,
+  "ema_fast": 4,
+  "ema_slow": 16,
+  "take_profit": 0.03,
+  "stop_loss": 0.0125,
+  "position_size": 0.20,
+  "volatility_threshold": 0.01,
+  "volume_period": 20,
+  "trend_ema_fast": 20,
+  "trend_ema_slow": 50,
+  "start_date": "2025-04-01",
+  "end_date": "2025-10-09"
+}

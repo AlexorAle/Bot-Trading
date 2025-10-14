@@ -1,0 +1,15 @@
+{
+  "BTCUSDT": {
+    "TrendFollowingADXEMAStrategy": {
+      "error": "Strategy disabled by regime detection",
+      "regime": "DISABLED"
+    },
+    "EMABreakoutConservativeStrategy": {
+      "error": "Strategy disabled by regime detection",
+      "regime": "DISABLED"
+    },
+    "PortfolioTotal": {
+      "error": "No valid results to aggregate"
+    }
+  }
+}

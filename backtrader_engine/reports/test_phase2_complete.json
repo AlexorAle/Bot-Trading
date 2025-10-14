@@ -1,0 +1,784 @@
+{
+  "BTCUSDT": {
+    "VolatilityBreakoutStrategy": {
+      "config": {
+        "strategy": "VolatilityBreakoutStrategy",
+        "symbol": "BTCUSDT",
+        "data_file": "data/BTCUSDT_15min.csv",
+        "timeframe": "15m",
+        "commission": 0.001,
+        "initial_cash": 10000,
+        "lookback": 10,
+        "atr_period": 14,
+        "multiplier": 1.0,
+        "trailing_stop": 0.015,
+        "position_size": 0.1,
+        "start_date": "2025-04-01",
+        "end_date": "2025-10-09"
+      },
+      "performance": {
+        "initial_cash": 10000,
+        "final_value": 9700.433668304182,
+        "total_return": -2.99566331695818
+      },
+      "analyzers": {
+        "sharpe": {
+          "sharperatio": null
+        },
+        "drawdown": {
+          "len": 16192,
+          "drawdown": 3.346097330678964,
+          "moneydown": 335.8229135867441,
+          "max": {
+            "len": 16192,
+            "drawdown": 4.043986916802336,
+            "moneydown": 405.86490310838235
+          }
+        },
+        "returns": {
+          "rtot": -0.0304145004114885,
+          "ravg": -0.00015840885630983594,
+          "rnorm": -0.03913276429719609,
+          "rnorm100": -3.913276429719609
+        },
+        "trades": {
+          "total": {
+            "total": 236,
+            "open": 1,
+            "closed": 235
+          },
+          "streak": {
+            "won": {
+              "current": 0,
+              "longest": 3
+            },
+            "lost": {
+              "current": 5,
+              "longest": 13
+            }
+          },
+          "pnl": {
+            "gross": {
+              "total": 164.2850551421395,
+              "average": 0.6990853410303809
+            },
+            "net": {
+              "total": -299.7364454237591,
+              "average": -1.2754742358457833
+            }
+          },
+          "won": {
+            "total": 55,
+            "pnl": {
+              "total": 1025.6096500274525,
+              "average": 18.64744818231732,
+              "max": 110.91741024302365
+            }
+          },
+          "lost": {
+            "total": 180,
+            "pnl": {
+              "total": -1325.346095451212,
+              "average": -7.3630338636178445,
+              "max": -23.334350680607916
+            }
+          },
+          "long": {
+            "total": 111,
+            "pnl": {
+              "total": -2.6812917199822373,
+              "average": -0.024155781261101236,
+              "won": {
+                "total": 799.3408398500776,
+                "average": 22.20391221805771,
+                "max": 110.91741024302365
+              },
+              "lost": {
+                "total": -802.02213157006,
+                "average": -10.693628420934132,
+                "max": -23.334350680607916
+              }
+            },
+            "won": 36,
+            "lost": 75
+          },
+          "short": {
+            "total": 124,
+            "pnl": {
+              "total": -297.055153703777,
+              "average": -2.3956060782562663,
+              "won": {
+                "total": 226.26881017737495,
+                "average": 11.908884746177629,
+                "max": 40.46983125271852
+              },
+              "lost": {
+                "total": -523.3239638811519,
+                "average": -4.984037751249066,
+                "max": -16.91870854425777
+              }
+            },
+            "won": 19,
+            "lost": 105
+          },
+          "len": {
+            "total": 16613,
+            "average": 70.6936170212766,
+            "max": 662,
+            "min": 1,
+            "won": {
+              "total": 9501,
+              "average": 172.74545454545455,
+              "max": 662,
+              "min": 1
+            },
+            "lost": {
+              "total": 7112,
+              "average": 39.51111111111111,
+              "max": 346,
+              "min": 1
+            },
+            "long": {
+              "total": 13416,
+              "average": 120.86486486486487,
+              "max": 662,
+              "min": 2,
+              "won": {
+                "total": 7567,
+                "average": 210.19444444444446,
+                "max": 662,
+                "min": 24
+              },
+              "lost": {
+                "total": 5849,
+                "average": 77.98666666666666,
+                "max": 346,
+                "min": 2
+              }
+            },
+            "short": {
+              "total": 3197,
+              "average": 25.782258064516128,
+              "max": 429,
+              "min": 1,
+              "won": {
+                "total": 1934,
+                "average": 101.78947368421052,
+                "max": 429,
+                "min": 1
+              },
+              "lost": {
+                "total": 1263,
+                "average": 12.028571428571428,
+                "max": 135,
+                "min": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "BollingerReversionStrategy": {
+      "error": ""
+    },
+    "RSIEMAMomentumStrategy": {
+      "config": {
+        "strategy": "RSIEMAMomentumStrategy",
+        "symbol": "BTCUSDT",
+        "data_file": "data/BTCUSDT_15min.csv",
+        "timeframe": "15m",
+        "commission": 0.001,
+        "initial_cash": 10000,
+        "rsi_period": 14,
+        "rsi_buy_threshold": 40,
+        "rsi_sell_threshold": 60,
+        "ema_period": 20,
+        "position_size": 0.15,
+        "take_profit": 0.02,
+        "stop_loss": 0.01,
+        "start_date": "2025-04-01",
+        "end_date": "2025-10-09"
+      },
+      "performance": {
+        "initial_cash": 10000,
+        "final_value": 10000.0,
+        "total_return": 0.0
+      },
+      "analyzers": {
+        "sharpe": {
+          "sharperatio": null
+        },
+        "drawdown": {
+          "len": 0,
+          "drawdown": 0.0,
+          "moneydown": 0.0,
+          "max": {
+            "len": 0.0,
+            "drawdown": 0.0,
+            "moneydown": 0.0
+          }
+        },
+        "returns": {
+          "rtot": 0.0,
+          "ravg": 0.0,
+          "rnorm": 0.0,
+          "rnorm100": 0.0
+        },
+        "trades": {
+          "total": {
+            "total": 0
+          }
+        }
+      }
+    },
+    "EMABreakoutConservativeStrategy": {
+      "config": {
+        "strategy": "EMABreakoutConservativeStrategy",
+        "symbol": "BTCUSDT",
+        "data_file": "data/BTCUSDT_15min.csv",
+        "timeframe": "15m",
+        "commission": 0.001,
+        "initial_cash": 10000,
+        "ema_fast": 6,
+        "ema_slow": 28,
+        "take_profit": 0.02,
+        "stop_loss": 0.0075,
+        "position_size": 0.08,
+        "volatility_threshold": 0.005,
+        "trend_ema_fast": 20,
+        "trend_ema_slow": 50,
+        "start_date": "2025-04-01",
+        "end_date": "2025-10-09"
+      },
+      "performance": {
+        "initial_cash": 10000,
+        "final_value": 9928.724346905256,
+        "total_return": -0.7127565309474448
+      },
+      "analyzers": {
+        "sharpe": {
+          "sharperatio": null
+        },
+        "drawdown": {
+          "len": 17522,
+          "drawdown": 1.0174928737702411,
+          "moneydown": 102.0625417754054,
+          "max": {
+            "len": 17522,
+            "drawdown": 1.2126257490357024,
+            "moneydown": 121.63590464303888
+          }
+        },
+        "returns": {
+          "rtot": -0.007153087750647265,
+          "ravg": -3.72556653679545e-05,
+          "rnorm": -0.009344493982565774,
+          "rnorm100": -0.9344493982565774
+        },
+        "trades": {
+          "total": {
+            "total": 47,
+            "open": 1,
+            "closed": 46
+          },
+          "streak": {
+            "won": {
+              "current": 0,
+              "longest": 3
+            },
+            "lost": {
+              "current": 1,
+              "longest": 12
+            }
+          },
+          "pnl": {
+            "gross": {
+              "total": 0.3464727359947435,
+              "average": 0.007532015999885728
+            },
+            "net": {
+              "total": -73.01837027531715,
+              "average": -1.587355875550373
+            }
+          },
+          "won": {
+            "total": 12,
+            "pnl": {
+              "total": 133.27741184465754,
+              "average": 11.106450987054794,
+              "max": 25.69969421847173
+            }
+          },
+          "lost": {
+            "total": 34,
+            "pnl": {
+              "total": -206.29578211997475,
+              "average": -6.067523003528669,
+              "max": -15.942172271126266
+            }
+          },
+          "long": {
+            "total": 17,
+            "pnl": {
+              "total": -64.3266940667761,
+              "average": -3.783923180398594,
+              "won": {
+                "total": 55.16080243596492,
+                "average": 18.38693414532164,
+                "max": 21.366681824005017
+              },
+              "lost": {
+                "total": -119.48749650274101,
+                "average": -8.534821178767215,
+                "max": -11.16751966701926
+              }
+            },
+            "won": 3,
+            "lost": 14
+          },
+          "short": {
+            "total": 29,
+            "pnl": {
+              "total": -8.691676208541057,
+              "average": -0.2997129727083123,
+              "won": {
+                "total": 78.11660940869264,
+                "average": 8.679623267632515,
+                "max": 25.69969421847173
+              },
+              "lost": {
+                "total": -86.80828561723368,
+                "average": -4.340414280861684,
+                "max": -15.942172271126266
+              }
+            },
+            "won": 9,
+            "lost": 20
+          },
+          "len": {
+            "total": 2096,
+            "average": 45.56521739130435,
+            "max": 544,
+            "min": 1,
+            "won": {
+              "total": 908,
+              "average": 75.66666666666667,
+              "max": 544,
+              "min": 1
+            },
+            "lost": {
+              "total": 1188,
+              "average": 34.94117647058823,
+              "max": 270,
+              "min": 1
+            },
+            "long": {
+              "total": 1257,
+              "average": 73.94117647058823,
+              "max": 544,
+              "min": 8,
+              "won": {
+                "total": 593,
+                "average": 197.66666666666666,
+                "max": 544,
+                "min": 18
+              },
+              "lost": {
+                "total": 664,
+                "average": 47.42857142857143,
+                "max": 193,
+                "min": 8
+              }
+            },
+            "short": {
+              "total": 839,
+              "average": 28.93103448275862,
+              "max": 270,
+              "min": 1,
+              "won": {
+                "total": 315,
+                "average": 35.0,
+                "max": 176,
+                "min": 1
+              },
+              "lost": {
+                "total": 524,
+                "average": 26.2,
+                "max": 270,
+                "min": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "ContrarianVolumeSpikeStrategy": {
+      "config": {
+        "strategy": "ContrarianVolumeSpikeStrategy",
+        "symbol": "BTCUSDT",
+        "data_file": "data/BTCUSDT_15min.csv",
+        "timeframe": "15m",
+        "commission": 0.001,
+        "initial_cash": 10000,
+        "volume_period": 20,
+        "volume_spike_multiplier": 2.0,
+        "spread_threshold": 0.01,
+        "position_size": 0.1,
+        "stop_loss": 0.015,
+        "take_profit": 0.03,
+        "rsi_period": 14,
+        "start_date": "2025-04-01",
+        "end_date": "2025-10-09"
+      },
+      "performance": {
+        "initial_cash": 10000,
+        "final_value": 9935.298547815219,
+        "total_return": -0.6470145218478137
+      },
+      "analyzers": {
+        "sharpe": {
+          "sharperatio": null
+        },
+        "drawdown": {
+          "len": 11301,
+          "drawdown": 0.7143993751786464,
+          "moneydown": 71.4884235992431,
+          "max": {
+            "len": 11301,
+            "drawdown": 0.8138457393837445,
+            "moneydown": 81.43980941606424
+          }
+        },
+        "returns": {
+          "rtot": -0.006491167334542125,
+          "ravg": -3.3808163200740234e-05,
+          "rnorm": -0.008483467694585018,
+          "rnorm100": -0.8483467694585017
+        },
+        "trades": {
+          "total": {
+            "total": 28,
+            "open": 0,
+            "closed": 28
+          },
+          "streak": {
+            "won": {
+              "current": 1,
+              "longest": 3
+            },
+            "lost": {
+              "current": 0,
+              "longest": 7
+            }
+          },
+          "pnl": {
+            "gross": {
+              "total": -8.80904506297059,
+              "average": -0.31460875224894963
+            },
+            "net": {
+              "total": -64.70145218477799,
+              "average": -2.3107661494563567
+            }
+          },
+          "won": {
+            "total": 10,
+            "pnl": {
+              "total": 79.68122033980634,
+              "average": 7.9681220339806345,
+              "max": 23.01813829630596
+            }
+          },
+          "lost": {
+            "total": 18,
+            "pnl": {
+              "total": -144.3826725245843,
+              "average": -8.021259584699129,
+              "max": -22.39035879874973
+            }
+          },
+          "long": {
+            "total": 10,
+            "pnl": {
+              "total": -20.978120255052698,
+              "average": -2.0978120255052697,
+              "won": {
+                "total": 59.332575747533866,
+                "average": 11.866515149506773,
+                "max": 23.01813829630596
+              },
+              "lost": {
+                "total": -80.31069600258657,
+                "average": -16.062139200517315,
+                "max": -22.39035879874973
+              }
+            },
+            "won": 5,
+            "lost": 5
+          },
+          "short": {
+            "total": 18,
+            "pnl": {
+              "total": -43.7233319297253,
+              "average": -2.42907399609585,
+              "won": {
+                "total": 20.34864459227247,
+                "average": 4.069728918454494,
+                "max": 7.70092942074522
+              },
+              "lost": {
+                "total": -64.07197652199777,
+                "average": -4.928613578615213,
+                "max": -14.748682011873752
+              }
+            },
+            "won": 5,
+            "lost": 13
+          },
+          "len": {
+            "total": 287,
+            "average": 10.25,
+            "max": 46,
+            "min": 1,
+            "won": {
+              "total": 135,
+              "average": 13.5,
+              "max": 30,
+              "min": 1
+            },
+            "lost": {
+              "total": 152,
+              "average": 8.444444444444445,
+              "max": 46,
+              "min": 1
+            },
+            "long": {
+              "total": 150,
+              "average": 15.0,
+              "max": 30,
+              "min": 3,
+              "won": {
+                "total": 91,
+                "average": 18.2,
+                "max": 30,
+                "min": 9
+              },
+              "lost": {
+                "total": 59,
+                "average": 11.8,
+                "max": 28,
+                "min": 3
+              }
+            },
+            "short": {
+              "total": 137,
+              "average": 7.611111111111111,
+              "max": 46,
+              "min": 1,
+              "won": {
+                "total": 44,
+                "average": 8.8,
+                "max": 23,
+                "min": 1
+              },
+              "lost": {
+                "total": 93,
+                "average": 7.153846153846154,
+                "max": 46,
+                "min": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "TrendFollowingADXEMAStrategy": {
+      "config": {
+        "strategy": "TrendFollowingADXEMAStrategy",
+        "symbol": "BTCUSDT",
+        "data_file": "data/BTCUSDT_15min.csv",
+        "timeframe": "15m",
+        "commission": 0.001,
+        "initial_cash": 10000,
+        "adx_period": 14,
+        "adx_threshold": 25,
+        "ema_fast": 12,
+        "ema_slow": 26,
+        "position_size": 0.2,
+        "take_profit": 0.05,
+        "stop_loss": 0.03,
+        "trailing_stop": 0.02,
+        "start_date": "2025-04-01",
+        "end_date": "2025-10-09"
+      },
+      "performance": {
+        "initial_cash": 10000,
+        "final_value": 8386.41959101259,
+        "total_return": -16.135804089874092
+      },
+      "analyzers": {
+        "sharpe": {
+          "sharperatio": null
+        },
+        "drawdown": {
+          "len": 18295,
+          "drawdown": 16.315082204686377,
+          "moneydown": 1635.003398880377,
+          "max": {
+            "len": 18295,
+            "drawdown": 16.34947234094895,
+            "moneydown": 1638.44977990205
+          }
+        },
+        "returns": {
+          "rtot": -0.17597141079497575,
+          "ravg": -0.0009165177645571653,
+          "rnorm": -0.20623074965677393,
+          "rnorm100": -20.623074965677393
+        },
+        "trades": {
+          "total": {
+            "total": 398,
+            "open": 0,
+            "closed": 398
+          },
+          "streak": {
+            "won": {
+              "current": 0,
+              "longest": 4
+            },
+            "lost": {
+              "current": 4,
+              "longest": 20
+            }
+          },
+          "pnl": {
+            "gross": {
+              "total": -156.64562587285985,
+              "average": -0.3935819745549243
+            },
+            "net": {
+              "total": -1613.580408987385,
+              "average": -4.054222133134133
+            }
+          },
+          "won": {
+            "total": 90,
+            "pnl": {
+              "total": 1497.6673485083788,
+              "average": 16.640748316759765,
+              "max": 90.80798301820144
+            }
+          },
+          "lost": {
+            "total": 308,
+            "pnl": {
+              "total": -3111.2477574957634,
+              "average": -10.101453758103128,
+              "max": -56.10448919237189
+            }
+          },
+          "long": {
+            "total": 199,
+            "pnl": {
+              "total": -625.7657911809756,
+              "average": -3.1445517144772643,
+              "won": {
+                "total": 779.2343641476999,
+                "average": 15.902742125463263,
+                "max": 90.80798301820144
+              },
+              "lost": {
+                "total": -1405.000155328676,
+                "average": -9.366667702191174,
+                "max": -38.64957181668023
+              }
+            },
+            "won": 49,
+            "lost": 150
+          },
+          "short": {
+            "total": 199,
+            "pnl": {
+              "total": -987.8146178064083,
+              "average": -4.963892551790996,
+              "won": {
+                "total": 718.4329843606788,
+                "average": 17.522755716114116,
+                "max": 86.33887770184306
+              },
+              "lost": {
+                "total": -1706.2476021670868,
+                "average": -10.799035456753714,
+                "max": -56.10448919237189
+              }
+            },
+            "won": 41,
+            "lost": 158
+          },
+          "len": {
+            "total": 7465,
+            "average": 18.756281407035175,
+            "max": 97,
+            "min": 1,
+            "won": {
+              "total": 3594,
+              "average": 39.93333333333333,
+              "max": 97,
+              "min": 1
+            },
+            "lost": {
+              "total": 3871,
+              "average": 12.568181818181818,
+              "max": 63,
+              "min": 1
+            },
+            "long": {
+              "total": 3784,
+              "average": 19.015075376884422,
+              "max": 97,
+              "min": 1,
+              "won": {
+                "total": 1994,
+                "average": 40.69387755102041,
+                "max": 97,
+                "min": 1
+              },
+              "lost": {
+                "total": 1790,
+                "average": 11.933333333333334,
+                "max": 50,
+                "min": 1
+              }
+            },
+            "short": {
+              "total": 3681,
+              "average": 18.497487437185928,
+              "max": 79,
+              "min": 1,
+              "won": {
+                "total": 1600,
+                "average": 39.02439024390244,
+                "max": 79,
+                "min": 2
+              },
+              "lost": {
+                "total": 2081,
+                "average": 13.170886075949367,
+                "max": 63,
+                "min": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "PortfolioTotal": {
+      "total_return": -4.098247691925506,
+      "max_drawdown": 16.34947234094895,
+      "total_trades": 709,
+      "win_rate": 23.554301833568406,
+      "strategies_count": 5
+    }
+  }
+}
