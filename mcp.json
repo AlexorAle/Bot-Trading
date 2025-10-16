@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem", "/workspace"],
+      "env": {
+        "ALLOWED_DIRECTORIES": "/workspace"
+      }
+    },
+    "github": {
+      "command": "npx", 
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_your_token_here"
+      }
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-sqlite"],
+      "env": {
+        "SQLITE_DB_PATH": "/workspace/data/trading_bot.db"
+      }
+    }
+  },
+  "globalSettings": {
+    "enableCaching": true,
+    "cacheTimeout": 300,
+    "maxConcurrentRequests": 5
+  }
+}
+

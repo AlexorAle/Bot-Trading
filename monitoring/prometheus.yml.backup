@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "prometheus_alerts.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+scrape_configs:
+  # Bot metrics
+  - job_name: 'trading-bot'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+    scrape_interval: 15s
+    metrics_path: /metrics
+    
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

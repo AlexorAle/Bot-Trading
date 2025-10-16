@@ -1,0 +1,47 @@
+groups:
+  - name: trading_bot_alerts
+    rules:
+      - alert: BotDown
+        expr: bot_status == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Trading bot is down"
+          description: "Trading bot has been down for more than 1 minute"
+
+      - alert: HighDrawdown
+        expr: (total_equity - total_equity offset 1h) / total_equity offset 1h < -0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High drawdown detected"
+          description: "Bot drawdown is greater than 5% in the last hour"
+
+      - alert: NoTrades
+        expr: increase(total_trades[1h]) == 0
+        for: 2h
+        labels:
+          severity: warning
+        annotations:
+          summary: "No trades executed"
+          description: "No trades have been executed in the last 2 hours"
+
+      - alert: StrategyFailure
+        expr: strategy_win_rate < 0.3
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Strategy performance degraded"
+          description: "Strategy {{ $labels.strategy_name }} win rate is below 30%"
+
+      - alert: RiskParityRebalance
+        expr: increase(risk_parity_rebalance_count[5m]) > 3
+        for: 1m
+        labels:
+          severity: info
+        annotations:
+          summary: "Frequent risk parity rebalancing"
+          description: "Risk parity has rebalanced more than 3 times in 5 minutes"

@@ -1,0 +1,11 @@
+{
+  "lookback": 18,
+  "atr_period": 14,
+  "multiplier": 2.3,
+  "trailing_stop": 0.028,
+  "position_size": 0.10,
+  "objective_value": 2.347,
+  "sharpe": 1.456,
+  "total_return": 0.187,
+  "max_drawdown": 0.080
+}

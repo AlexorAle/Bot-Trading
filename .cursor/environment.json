@@ -1,0 +1,31 @@
+{
+  "agentCanUpdateSnapshot": true,
+  "install": "pip install -r requirements.txt --no-cache-dir && echo 'Dependencies installed successfully.'",
+  "start": "python -c \"import sys; print('Python version:', sys.version)\" && python -c \"import ccxt, pandas, backtrader; print('Core dependencies verified')\" && echo 'Trading bot environment ready.'",
+  "baseImage": "ghcr.io/cursor-images/python-3.12:latest",
+  "terminals": [
+    {
+      "name": "trading-bot-logs",
+      "command": "tail -f logs/bot.log",
+      "ports": [8000, 8501]
+    },
+    {
+      "name": "gitops-watcher",
+      "command": "python run_git_watcher.py --verbose",
+      "ports": []
+    }
+  ],
+  "env": {
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONPATH": "/workspace",
+    "CACHE_DIR": "/tmp/trading_cache",
+    "LOG_LEVEL": "INFO",
+    "MODE": "development"
+  },
+  "persistedDirectories": [
+    "/workspace/logs",
+    "/workspace/reports", 
+    "/workspace/data",
+    "/workspace/models"
+  ]
+}

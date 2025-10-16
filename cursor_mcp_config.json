@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "aci-dev": {
+      "command": "python",
+      "args": ["simple_mcp_server.py"],
+      "cwd": "C:\\Mis_Proyectos\\BOT Trading\\aci\\backend"
+    }
+  }
+}

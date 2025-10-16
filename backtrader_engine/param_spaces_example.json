@@ -1,0 +1,289 @@
+{
+  "VolatilityBreakoutStrategy": {
+    "lookback": {
+      "type": "int",
+      "low": 10,
+      "high": 30,
+      "description": "Lookback period for highest/lowest calculation"
+    },
+    "atr_period": {
+      "type": "int", 
+      "low": 10,
+      "high": 20,
+      "description": "ATR calculation period"
+    },
+    "multiplier": {
+      "type": "float",
+      "low": 1.0,
+      "high": 3.0,
+      "description": "ATR multiplier for volatility threshold"
+    },
+    "trailing_stop": {
+      "type": "float",
+      "low": 0.01,
+      "high": 0.05,
+      "description": "Trailing stop percentage"
+    },
+    "position_size": {
+      "type": "float",
+      "low": 0.05,
+      "high": 0.20,
+      "description": "Position size as fraction of capital"
+    }
+  },
+  
+  "RSIEMAMomentumStrategy": {
+    "rsi_period": {
+      "type": "int",
+      "low": 10,
+      "high": 20,
+      "description": "RSI calculation period"
+    },
+    "rsi_buy_threshold": {
+      "type": "int",
+      "low": 50,
+      "high": 70,
+      "description": "RSI threshold for buy signals"
+    },
+    "rsi_sell_threshold": {
+      "type": "int",
+      "low": 30,
+      "high": 50,
+      "description": "RSI threshold for sell signals"
+    },
+    "ema_period": {
+      "type": "int",
+      "low": 20,
+      "high": 50,
+      "description": "EMA period for trend confirmation"
+    },
+    "take_profit": {
+      "type": "float",
+      "low": 0.015,
+      "high": 0.040,
+      "description": "Take profit percentage"
+    },
+    "stop_loss": {
+      "type": "float",
+      "low": 0.008,
+      "high": 0.020,
+      "description": "Stop loss percentage"
+    },
+    "volume_filter": {
+      "type": "float",
+      "low": 0.8,
+      "high": 1.5,
+      "description": "Volume filter multiplier"
+    },
+    "cooldown_period": {
+      "type": "int",
+      "low": 1,
+      "high": 10,
+      "description": "Cooldown period between trades"
+    },
+    "risk_tolerance": {
+      "type": "float",
+      "low": 0.01,
+      "high": 0.05,
+      "description": "Risk tolerance for position sizing"
+    }
+  },
+  
+  "EMABreakoutConservativeStrategy": {
+    "ema_fast": {
+      "type": "int",
+      "low": 8,
+      "high": 20,
+      "description": "Fast EMA period"
+    },
+    "ema_slow": {
+      "type": "int",
+      "low": 20,
+      "high": 40,
+      "description": "Slow EMA period"
+    },
+    "take_profit": {
+      "type": "float",
+      "low": 0.015,
+      "high": 0.035,
+      "description": "Take profit percentage"
+    },
+    "stop_loss": {
+      "type": "float",
+      "low": 0.005,
+      "high": 0.020,
+      "description": "Stop loss percentage"
+    },
+    "position_size": {
+      "type": "float",
+      "low": 0.05,
+      "high": 0.15,
+      "description": "Position size as fraction of capital"
+    },
+    "volatility_threshold": {
+      "type": "float",
+      "low": 0.001,
+      "high": 0.010,
+      "description": "Minimum volatility threshold for entries"
+    },
+    "trend_filter_ema_period": {
+      "type": "int",
+      "low": 50,
+      "high": 200,
+      "description": "EMA period for trend filter"
+    },
+    "max_bars_in_trade": {
+      "type": "int",
+      "low": 48,
+      "high": 144,
+      "description": "Maximum bars to hold a position"
+    }
+  },
+  
+  "BollingerReversionStrategy": {
+    "bb_period": {
+      "type": "int",
+      "low": 14,
+      "high": 25,
+      "description": "Bollinger Bands period"
+    },
+    "std_dev": {
+      "type": "float",
+      "low": 1.5,
+      "high": 3.0,
+      "description": "Standard deviation multiplier for Bollinger Bands"
+    },
+    "take_profit": {
+      "type": "float",
+      "low": 0.010,
+      "high": 0.030,
+      "description": "Take profit percentage"
+    },
+    "stop_loss": {
+      "type": "float",
+      "low": 0.005,
+      "high": 0.015,
+      "description": "Stop loss percentage"
+    },
+    "position_size": {
+      "type": "float",
+      "low": 0.05,
+      "high": 0.15,
+      "description": "Position size as fraction of capital"
+    },
+    "volume_filter_period": {
+      "type": "int",
+      "low": 15,
+      "high": 30,
+      "description": "Volume filter calculation period"
+    },
+    "max_bars_in_trade": {
+      "type": "int",
+      "low": 24,
+      "high": 72,
+      "description": "Maximum bars to hold a position"
+    },
+    "adx_filter_max": {
+      "type": "int",
+      "low": 15,
+      "high": 25,
+      "description": "Maximum ADX value for trend filter"
+    }
+  },
+  
+  "ContrarianVolumeSpikeStrategy": {
+    "volume_period": {
+      "type": "int",
+      "low": 15,
+      "high": 30,
+      "description": "Volume average calculation period"
+    },
+    "volume_spike_multiplier": {
+      "type": "float",
+      "low": 2.0,
+      "high": 4.0,
+      "description": "Volume spike detection multiplier"
+    },
+    "spread_threshold": {
+      "type": "float",
+      "low": 0.005,
+      "high": 0.020,
+      "description": "Minimum spread threshold for entries"
+    },
+    "take_profit": {
+      "type": "float",
+      "low": 0.015,
+      "high": 0.035,
+      "description": "Take profit percentage"
+    },
+    "stop_loss": {
+      "type": "float",
+      "low": 0.008,
+      "high": 0.020,
+      "description": "Stop loss percentage"
+    },
+    "position_size": {
+      "type": "float",
+      "low": 0.05,
+      "high": 0.15,
+      "description": "Position size as fraction of capital"
+    },
+    "rsi_buy_threshold": {
+      "type": "int",
+      "low": 25,
+      "high": 35,
+      "description": "RSI threshold for buy signals"
+    },
+    "rsi_sell_threshold": {
+      "type": "int",
+      "low": 65,
+      "high": 75,
+      "description": "RSI threshold for sell signals"
+    }
+  },
+  
+  "TrendFollowingADXEMAStrategy": {
+    "adx_threshold": {
+      "type": "int",
+      "low": 15,
+      "high": 35,
+      "description": "ADX threshold for trend strength"
+    },
+    "ema_fast": {
+      "type": "int",
+      "low": 8,
+      "high": 20,
+      "description": "Fast EMA period"
+    },
+    "ema_slow": {
+      "type": "int",
+      "low": 20,
+      "high": 50,
+      "description": "Slow EMA period"
+    },
+    "take_profit": {
+      "type": "float",
+      "low": 0.020,
+      "high": 0.060,
+      "description": "Take profit percentage"
+    },
+    "stop_loss": {
+      "type": "float",
+      "low": 0.010,
+      "high": 0.030,
+      "description": "Stop loss percentage"
+    },
+    "position_size": {
+      "type": "float",
+      "low": 0.05,
+      "high": 0.20,
+      "description": "Position size as fraction of capital"
+    },
+    "trailing_stop": {
+      "type": "float",
+      "low": 0.008,
+      "high": 0.020,
+      "description": "Trailing stop percentage"
+    }
+  }
+}

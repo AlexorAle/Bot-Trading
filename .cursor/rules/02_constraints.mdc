@@ -1,0 +1,24 @@
+---
+description: Restricciones para limitar el tamaño del contexto y la complejidad de las ediciones.
+alwaysApply: true
+---
+## Operational Constraints
+
+### File Limits
+- **Max file line count**: 7000 (Balance entre productividad y mantenibilidad para proyectos de trading).
+- **Max edit size**: 750 lines (Cambios enfocados para módulos de trading bot).
+- **Max search depth**: 4 directories (Suficiente para estructura modular de trading bot).
+- **Max file size**: 10MB (Previene problemas de memoria con datasets grandes).
+
+### Prompt Crafting (Context Management)
+- **Always focus on the task's scope**. If a file is not directly relevant, **do not include its full context**.
+- For trading strategies, understand the risk management implications.
+- When modifying execution modules, consider market impact.
+- Always verify data flow integrity in trading pipelines.
+
+### Trading Bot Specific Constraints
+- Preserve error handling in trading execution modules.
+- Maintain logging consistency across all trading components.
+- Verify configuration changes don't break trading logic.
+- Test critical trading functions before deployment.
+- Preserve risk management parameters and validation.

@@ -1,0 +1,92 @@
+{
+  "optimization_completed": true,
+  "strategy": "VolatilityBreakoutStrategy",
+  "data_period": "2024-01-01 to 2025-01-01",
+  "trials": 150,
+  "duration_seconds": 2847,
+  "duration_minutes": 47.5,
+  "best_rmd": 2.347,
+  "best_trial": 89,
+  "best_params": {
+    "lookback": 18,
+    "atr_period": 14,
+    "multiplier": 2.3,
+    "trailing_stop": 0.028,
+    "position_size": 0.10
+  },
+  "performance": {
+    "rmd": 2.347,
+    "sharpe": 1.456,
+    "total_return": 0.187,
+    "max_drawdown": 0.080
+  },
+  "top_5_trials": [
+    {
+      "rank": 1,
+      "trial_number": 89,
+      "rmd": 2.347,
+      "sharpe": 1.456,
+      "params": {
+        "lookback": 18,
+        "atr_period": 14,
+        "multiplier": 2.3,
+        "trailing_stop": 0.028,
+        "position_size": 0.10
+      }
+    },
+    {
+      "rank": 2,
+      "trial_number": 67,
+      "rmd": 2.289,
+      "sharpe": 1.423,
+      "params": {
+        "lookback": 20,
+        "atr_period": 15,
+        "multiplier": 2.2,
+        "trailing_stop": 0.025,
+        "position_size": 0.09
+      }
+    },
+    {
+      "rank": 3,
+      "trial_number": 124,
+      "rmd": 2.156,
+      "sharpe": 1.389,
+      "params": {
+        "lookback": 16,
+        "atr_period": 13,
+        "multiplier": 2.4,
+        "trailing_stop": 0.030,
+        "position_size": 0.11
+      }
+    },
+    {
+      "rank": 4,
+      "trial_number": 45,
+      "rmd": 2.098,
+      "sharpe": 1.334,
+      "params": {
+        "lookback": 22,
+        "atr_period": 16,
+        "multiplier": 2.1,
+        "trailing_stop": 0.022,
+        "position_size": 0.08
+      }
+    },
+    {
+      "rank": 5,
+      "trial_number": 112,
+      "rmd": 2.045,
+      "sharpe": 1.298,
+      "params": {
+        "lookback": 19,
+        "atr_period": 14,
+        "multiplier": 2.5,
+        "trailing_stop": 0.032,
+        "position_size": 0.12
+      }
+    }
+  ],
+  "completed_at": "2025-01-14T16:30:00.000000",
+  "simulation": true
+}

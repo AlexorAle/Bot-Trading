@@ -17,5 +17,7 @@ matplotlib==3.9.2
 plotly==6.3.1
 schedule==1.2.2
 streamlit==1.50.0
+optuna==3.6.1
+backtrader==1.9.78.123
 
 

@@ -1,0 +1,223 @@
+# ===========================================
+# CURSOR IGNORE - OPTIMIZACIÓN PARA AGENTE
+# ===========================================
+
+# ===========================================
+# 1. ENTORNOS VIRTUALES Y DEPENDENCIAS
+# ===========================================
+venv/
+.venv/
+env/
+.env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ===========================================
+# 2. DATOS HISTÓRICOS Y ARCHIVOS GRANDES
+# ===========================================
+# Datos de trading (archivos CSV grandes)
+backtrader_engine/data/*.csv
+data/*.csv
+*.csv
+bot-trading/data/*.csv
+
+# Archivos de datos históricos
+/data_history/*
+/historical_data/*
+/market_data/*
+
+# ===========================================
+# 3. REPORTES Y LOGS (MUY VOLUMINOSOS)
+# ===========================================
+# Reportes de backtesting (126 archivos JSON)
+backtrader_engine/reports/
+reports/
+logs/
+*.log
+*.log.*
+
+# Archivos de optimización
+backtrader_engine/reports/optuna*/
+backtrader_engine/reports/portfolio_*/
+
+# ===========================================
+# 4. CÓDIGO DEPRECADO (719 archivos Freqtrade)
+# ===========================================
+deprecated/
+bot-trading/deprecated/
+aci/  # Proyecto completo duplicado
+
+# ===========================================
+# 5. DUPLICACIÓN DE PROYECTO
+# ===========================================
+# Carpeta completa duplicada
+bot-trading/
+
+# ===========================================
+# 6. ARCHIVOS TEMPORALES Y DE SISTEMA
+# ===========================================
+# Archivos de proceso
+*.pid
+bot.pid
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================================
+# 7. ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+# ===========================================
+# Configuraciones que pueden contener API keys
+*.env
+.env.*
+config_*.json
+bot_status.json
+
+# ===========================================
+# 8. ARCHIVOS DE MONITOREO Y MÉTRICAS
+# ===========================================
+# Archivos de monitoreo (pueden ser grandes)
+monitoring/
+docs/monitoring_setup.md
+CONSOLIDACION_MONITOREO_INFORME_FINAL.md
+
+# ===========================================
+# 9. ARCHIVOS DE TESTING Y DEBUG
+# ===========================================
+# Archivos de prueba y debug
+test_*.py
+*_test.py
+debug_*.py
+diagnose.py
+diagnostico_*.py
+
+# ===========================================
+# 10. ARCHIVOS DE DOCUMENTACIÓN VOLUMINOSA
+# ===========================================
+# Documentación extensa que no necesita indexación
+*.md
+!README.md
+!backtrader_engine/OPTIMIZER_README.md
+!backtrader_engine/PORTFOLIO_README.md
+
+# ===========================================
+# 11. ARCHIVOS DE MODELOS ML
+# ===========================================
+# Modelos entrenados (pueden ser grandes)
+models/
+*.pkl
+*.joblib
+*.h5
+*.model
+
+# ===========================================
+# 12. ARCHIVOS DE CACHE Y TEMPORALES
+# ===========================================
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# ===========================================
+# 13. ARCHIVOS DE CONFIGURACIÓN DE HERRAMIENTAS
+# ===========================================
+# Configuraciones de herramientas de desarrollo
+.cursorignore
+.gitignore
+.git/
+.vscode/
+.idea/
+*.sublime-*
+
+# ===========================================
+# 14. ARCHIVOS DE INTEGRACIÓN Y MCP
+# ===========================================
+# Archivos de integración con Cursor MCP
+cursor_mcp_*
+mcp_*
+gitops_*
+git_watcher.py
+run_git_watcher.py
+
+# ===========================================
+# 15. ARCHIVOS DE EVIDENCIA Y DIAGNÓSTICO
+# ===========================================
+# Archivos de evidencia de problemas
+evidencia_*.txt
+problema_*.txt
+*_problema_*.txt
+
+# ===========================================
+# 16. ARCHIVOS DE DASHBOARD Y UI
+# ===========================================
+# Archivos de interfaz de usuario
+dashboard*.py
+*_dashboard.py
+test_plotly.py
+
+# ===========================================
+# 17. ARCHIVOS DE SCRIPTS AUXILIARES
+# ===========================================
+# Scripts que no son parte del core del bot
+clean_strategy.py
+train_model.py
+quantconnect_main.py
+verificacion_completa.py
+ejemplo_integracion_cursor.py
+list_mcp_tools.py
+
+# ===========================================
+# 18. ARCHIVOS DE CONFIGURACIÓN DE AGENTES
+# ===========================================
+# Configuraciones específicas de agentes
+Agent supervisor Github/
+GITOPS_AGENT_README.md
+GITOPS_WATCHER_AGENT_DOCUMENTATION.md
+
+# ===========================================
+# 19. ARCHIVOS DE ANÁLISIS Y REPORTES
+# ===========================================
+# Archivos de análisis que no necesitan indexación
+ANALISIS_MULTI_ESTRATEGIA_COMPLETO.md
+OPTIMIZER_STATUS_REPORT.md
+PASO_2_*_REPORT.md
+MIGRACION_FREQTRADE_TO_BACKTRADER.md
+
+# ===========================================
+# 20. ARCHIVOS DE TESTING DE OPTIMIZACIÓN
+# ===========================================
+# Archivos de prueba del optimizador
+quick_test.py
+test_optimizer.py
+simulate_optimization_results.py
+run_optimization*.py
+direct_optimization.py
+check_dependencies.py

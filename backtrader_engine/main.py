@@ -10,6 +10,8 @@ import json
 import argparse
 import sys
 import importlib
+import threading
+import time
 from pathlib import Path
 from strategies.liquidation_hunter import LiquidationHunterStrategy
 from strategies.simple_test import SimpleTestStrategy
@@ -21,6 +23,56 @@ from strategies.bollinger_reversion import BollingerReversionStrategy
 from strategies.rsi_ema_momentum import RSIEMAMomentumStrategy
 from strategies.contrarian_volume import ContrarianVolumeSpikeStrategy
 from strategies.trend_following_adx_ema import TrendFollowingADXEMAStrategy
+
+# Import monitoring system and Prometheus metrics
+try:
+    import sys
+    from pathlib import Path
+    # Add parent directory to path to import monitoring
+    parent_dir = Path(__file__).parent.parent
+    sys.path.insert(0, str(parent_dir))
+    
+    from monitoring.bot_monitor import get_monitor
+    from monitoring.metrics_server import start_metrics_server
+    from prometheus_client import start_http_server, Gauge, Counter, Histogram
+    MONITORING_AVAILABLE = True
+    print("✅ Monitoring system available")
+except ImportError as e:
+    print(f"⚠️ Monitoring system not available: {e}")
+    MONITORING_AVAILABLE = False
+
+# Prometheus metrics definitions with portfolio and asset_class labels
+if MONITORING_AVAILABLE:
+    PORTFOLIO_VALUE = Gauge(
+        'bt_portfolio_value', 
+        'Valor actual del portfolio (Equity)', 
+        ['portfolio', 'asset_class', 'strategy', 'symbol']
+    )
+    
+    TRADES_CLOSED = Counter(
+        'bt_trades_closed_total', 
+        'Conteo de trades cerrados', 
+        ['portfolio', 'asset_class', 'strategy', 'symbol', 'result']
+    )
+    
+    TRADE_PNL = Histogram(
+        'bt_trade_pnl',
+        'PnL por trade',
+        ['portfolio', 'asset_class', 'strategy', 'symbol'],
+        buckets=[-1000, -500, -100, -50, -10, 0, 10, 50, 100, 500, 1000, float('inf')]
+    )
+    
+    DRAWDOWN_PERCENT = Gauge(
+        'bt_drawdown_percent',
+        'Drawdown actual en porcentaje',
+        ['portfolio', 'asset_class', 'strategy', 'symbol']
+    )
+    
+    WIN_RATE = Gauge(
+        'bt_win_rate',
+        'Tasa de aciertos en porcentaje',
+        ['portfolio', 'asset_class', 'strategy', 'symbol']
+    )
 
 
 class PandasData(bt.feeds.PandasData):
@@ -93,7 +145,7 @@ def load_data(data_file, start_date=None, end_date=None):
         sys.exit(1)
 
 
-def run_backtest(config):
+def run_backtest(config, monitor=None):
     """Run backtest with given configuration"""
     print(f"\n🚀 Starting backtest for {config['symbol']}")
     print("=" * 50)
@@ -242,6 +294,138 @@ def run_backtest(config):
     # Get analyzer results
     strat = results[0]
     
+    # Update monitoring metrics
+    if monitor:
+        try:
+            strategy_name = config.get('strategy', 'UnknownStrategy')
+            symbol = config.get('symbol', 'UnknownSymbol')
+            bot_id = f"backtrader_{strategy_name}_{symbol.replace('/', '_')}"
+            
+            # Get trade statistics
+            trades = getattr(strat, 'analyzers', {}).get('trades', {})
+            total_trades = trades.get('total', {}).get('total', 0) if trades else 0
+            won_trades = trades.get('won', {}).get('total', 0) if trades else 0
+            win_rate = (won_trades / total_trades * 100) if total_trades > 0 else 0
+            
+            # Update bot status
+            monitor.update_bot_status(
+                bot_id=bot_id,
+                status="completed",
+                equity=final_value,
+                trades=total_trades,
+                positions=0
+            )
+            
+            # Update strategy metrics
+            monitor.update_strategy_metrics(
+                strategy_name=strategy_name,
+                symbol=symbol,
+                equity=final_value,
+                pnl=total_return,
+                trades=total_trades,
+                win_rate=win_rate
+            )
+            
+            print("✅ Monitoring metrics updated")
+        except Exception as e:
+            print(f"⚠️ Failed to update monitoring metrics: {e}")
+    
+    # Update Prometheus metrics with portfolio labels
+    if MONITORING_AVAILABLE:
+        try:
+            strategy_name = config.get('strategy', 'UnknownStrategy')
+            symbol = config.get('symbol', 'UnknownSymbol')
+            
+            # Determine portfolio and asset class based on symbol
+            if '/' in symbol and any(crypto in symbol.upper() for crypto in ['BTC', 'ETH', 'SOL', 'ADA', 'DOT']):
+                portfolio = 'crypto'
+                asset_class = 'futures'
+            elif '/' in symbol and any(forex in symbol.upper() for forex in ['EUR', 'GBP', 'JPY', 'AUD', 'CAD']):
+                portfolio = 'forex'
+                asset_class = 'spot'
+            else:
+                portfolio = 'crypto'  # Default to crypto
+                asset_class = 'futures'
+            
+            # Get trade statistics
+            trades = strat.analyzers.trades.get_analysis()
+            total_trades = trades.get('total', {}).get('total', 0)
+            won_trades = trades.get('won', {}).get('total', 0)
+            lost_trades = trades.get('lost', {}).get('total', 0)
+            win_rate = (won_trades / total_trades * 100) if total_trades > 0 else 0
+            
+            # Get drawdown
+            drawdown = strat.analyzers.drawdown.get_analysis()
+            max_drawdown = drawdown.get('max', {}).get('drawdown', 0)
+            
+            # Update Prometheus metrics
+            PORTFOLIO_VALUE.labels(
+                portfolio=portfolio,
+                asset_class=asset_class,
+                strategy=strategy_name,
+                symbol=symbol
+            ).set(final_value)
+            
+            # Update trade counters
+            TRADES_CLOSED.labels(
+                portfolio=portfolio,
+                asset_class=asset_class,
+                strategy=strategy_name,
+                symbol=symbol,
+                result='win'
+            ).inc(won_trades)
+            
+            TRADES_CLOSED.labels(
+                portfolio=portfolio,
+                asset_class=asset_class,
+                strategy=strategy_name,
+                symbol=symbol,
+                result='loss'
+            ).inc(lost_trades)
+            
+            # Update drawdown
+            DRAWDOWN_PERCENT.labels(
+                portfolio=portfolio,
+                asset_class=asset_class,
+                strategy=strategy_name,
+                symbol=symbol
+            ).set(max_drawdown)
+            
+            # Update win rate
+            WIN_RATE.labels(
+                portfolio=portfolio,
+                asset_class=asset_class,
+                strategy=strategy_name,
+                symbol=symbol
+            ).set(win_rate)
+            
+            # Record PnL for winning trades
+            if 'won' in trades and 'pnl' in trades['won']:
+                avg_win = trades['won']['pnl'].get('average', 0)
+                for _ in range(won_trades):
+                    TRADE_PNL.labels(
+                        portfolio=portfolio,
+                        asset_class=asset_class,
+                        strategy=strategy_name,
+                        symbol=symbol
+                    ).observe(avg_win)
+            
+            # Record PnL for losing trades
+            if 'lost' in trades and 'pnl' in trades['lost']:
+                avg_loss = trades['lost']['pnl'].get('average', 0)
+                for _ in range(lost_trades):
+                    TRADE_PNL.labels(
+                        portfolio=portfolio,
+                        asset_class=asset_class,
+                        strategy=strategy_name,
+                        symbol=symbol
+                    ).observe(avg_loss)
+            
+            print(f"✅ Prometheus metrics updated - Portfolio: {portfolio}, Asset: {asset_class}")
+            
+        except Exception as e:
+            print(f"⚠️ Failed to update Prometheus metrics: {e}")
+    
     # Create detailed report
     report = generate_detailed_report(strat, config, final_value, total_return)
     
@@ -353,8 +537,36 @@ def main():
     config_path = Path(__file__).parent / args.config
     config = load_config(config_path)
     
+    # Initialize monitoring system
+    monitor = None
+    if MONITORING_AVAILABLE:
+        try:
+            # Start Prometheus metrics server on port 8000
+            start_http_server(8000)
+            print("🚀 Prometheus metrics server started on port 8000")
+            
+            # Start legacy metrics server on port 8080
+            start_metrics_server(port=8080)
+            
+            # Get monitor instance
+            monitor = get_monitor()
+            
+            # Register bot
+            strategy_name = config.get('strategy', 'UnknownStrategy')
+            symbol = config.get('symbol', 'UnknownSymbol')
+            monitor.register_bot(
+                bot_id=f"backtrader_{strategy_name}_{symbol.replace('/', '_')}",
+                bot_type="backtesting",
+                config=config
+            )
+            
+            print("✅ Monitoring system initialized")
+        except Exception as e:
+            print(f"⚠️ Failed to initialize monitoring: {e}")
+            monitor = None
+    
     # Run backtest
-    results = run_backtest(config)
+    results = run_backtest(config, monitor)
     
     print("\n✅ Backtest completed successfully!")
 

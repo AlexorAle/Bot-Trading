@@ -1,0 +1,30 @@
+---
+description: Reglas operativas para asegurar la eficiencia del agente y minimizar el I/O.
+alwaysApply: true
+---
+## Cursor Operation Rules
+
+### Edit Handling: Single-Pass Editing
+- Make all necessary changes in a **single pass**.
+- Group related edits together.
+- **Avoid multiple iterations** over the same file (unless explicitly requested).
+- Use format: ```language:path/to/file\n// existing...\n{{edited}}\n// existing...```
+
+### Performance Optimization: Operation Batching
+- **Group related operations** (e.g., file writes).
+- **Minimize file reads/writes**.
+- Use **bulk operations** when possible.
+- **Targets:** Edit <100ms, Search <200ms, File ops <50ms.
+- Cache data when possible for repeated operations.
+
+### Resource Management
+- Release resources promptly.
+- **Manage memory efficiently** during long operations.
+- Close trading connections properly to avoid resource leaks.
+- Use connection pooling for database operations.
+
+### Trading Bot Specific Performance
+- Optimize for real-time performance in trading strategies.
+- Implement proper cleanup in trading bot shutdown procedures.
+- Cache market data to reduce API calls.
+- Use efficient data structures for time-series data.

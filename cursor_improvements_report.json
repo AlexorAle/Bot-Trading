@@ -1,0 +1,101 @@
+{
+  "timestamp": "2025-10-15T14:31:25.372457",
+  "environment_json": {
+    "status": "success",
+    "score": 100.0,
+    "checks": {
+      "agentCanUpdateSnapshot": true,
+      "has_real_install_script": true,
+      "has_real_start_script": true,
+      "has_base_image": true,
+      "has_terminals": true,
+      "has_env_vars": true,
+      "has_persisted_dirs": true
+    },
+    "config": {
+      "agentCanUpdateSnapshot": true,
+      "install": "pip install -r requirements.txt --no-cache-dir && echo 'Dependencies installed successfully.'",
+      "start": "python -c \"import sys; print('Python version:', sys.version)\" && python -c \"import ccxt, pandas, backtrader; print('Core dependencies verified')\" && echo 'Trading bot environment ready.'",
+      "baseImage": "ghcr.io/cursor-images/python-3.12:latest",
+      "terminals": [
+        {
+          "name": "trading-bot-logs",
+          "command": "tail -f logs/bot.log",
+          "ports": [
+            8000,
+            8501
+          ]
+        },
+        {
+          "name": "gitops-watcher",
+          "command": "python run_git_watcher.py --verbose",
+          "ports": []
+        }
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONPATH": "/workspace",
+        "CACHE_DIR": "/tmp/trading_cache",
+        "LOG_LEVEL": "INFO",
+        "MODE": "development"
+      },
+      "persistedDirectories": [
+        "/workspace/logs",
+        "/workspace/reports",
+        "/workspace/data",
+        "/workspace/models"
+      ]
+    }
+  },
+  "cursorrules_json": {
+    "status": "success",
+    "score": 100.0,
+    "checks": {
+      "has_description": true,
+      "has_rules": true,
+      "has_edit_handling": true,
+      "has_performance": true,
+      "has_constraints": true,
+      "has_trading_specific": true,
+      "has_error_prevention": true
+    },
+    "rules_count": 7
+  },
+  "mcp_json": {
+    "status": "success",
+    "score": 100.0,
+    "checks": {
+      "has_mcp_servers": true,
+      "has_filesystem": true,
+      "has_github": true,
+      "has_sqlite": true,
+      "has_global_settings": true,
+      "has_caching": true
+    },
+    "servers_count": 3
+  },
+  "performance_tests": {
+    "import_time": {
+      "status": "success",
+      "time": 19.64763617515564
+    },
+    "gitops_time": {
+      "status": "success",
+      "time": 7.631288290023804,
+      "returncode": 0
+    },
+    "persisted_directories": {
+      "logs": true,
+      "reports": true,
+      "data": true,
+      "models": true
+    }
+  },
+  "recommendations": [
+    "\u2705 environment.json configurado correctamente",
+    "\u2705 .cursorrules.json configurado correctamente",
+    "\u2705 mcp.json configurado correctamente",
+    "\u26a0\ufe0f Tiempo de importaci\u00f3n lento: 19.65s (objetivo: <5s)",
+    "\u2705 GitOps_Watcher r\u00e1pido: 7.63s"
+  ]
+}

@@ -1,0 +1,34 @@
+monitoring:
+  development:
+    host: localhost
+    ports:
+      grafana: 3000
+      prometheus: 9090
+      metrics: 8080
+    auth_enabled: false
+    cors_origins:
+      - "*"
+    scrape_interval: 15
+    log_directories:
+      - "backtrader_engine/reports/portfolio_*"
+      - "backtrader_engine/reports/forex_*"
+    bot_types:
+      - crypto
+      - forex
+  production:
+    host: ${VPS_HOST}
+    ports:
+      grafana: 3000
+      prometheus: 9090
+      metrics: 8080
+    auth_enabled: true
+    cors_origins:
+      - "${ALLOWED_ORIGINS}"
+    api_key: "${API_KEY}"
+    scrape_interval: 30
+    log_directories:
+      - "backtrader_engine/reports/portfolio_*"
+      - "backtrader_engine/reports/forex_*"
+    bot_types:
+      - crypto
+      - forex
