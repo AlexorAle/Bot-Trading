@@ -1,0 +1,278 @@
+#!/usr/bin/env python3
+"""
+Entry point for VSTRU Trading Strategy - Signals every 15 minutes
+Based on agent guide: GUIA_TESTING_BYBIT_TESTNET_VSTRU.md
+"""
+
+import asyncio
+import json
+import logging
+import signal
+import sys
+import time
+from datetime import datetime, timezone
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/vstru_trading.log'),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+# Import trading engine
+from exchanges.bybit_paper_trader import BybitPaperTrader
+from signal_engine import TradingSignal
+
+
+class VSTRUTradingBot:
+    """
+    Bot with VSTRU Strategy - Generates signals every 15 minutes
+
+    VSTRU Logic:
+    - Frequency: Every 15 minutes (900 seconds)
+    - Symbols: ETHUSDT, BTCUSDT, SOLUSDT
+    - Signals: BUY/SELL alternating for testing
+    - Confidence: 0.75 (high enough to pass risk checks)
+    """
+
+    def __init__(self, config_path='configs/bybit_x_config.json'):
+        self.config_path = config_path
+        self.config = self._load_config()
+        self.paper_trader = None
+        self.running = False
+        self.start_time = None
+
+        # VSTRU Strategy state
+        self.signal_counter = 0
+        self.last_signal_time = {}
+        self.signal_interval = 900  # 15 minutes in seconds
+        self.symbols = ['ETHUSDT', 'BTCUSDT', 'SOLUSDT']
+
+        logger.info("VSTRUTradingBot initialized")
+        logger.info("Symbols: %s", self.symbols)
+        logger.info("Signal interval: %s seconds", self.signal_interval)
+
+    def _load_config(self):
+        """Load configuration from JSON"""
+        try:
+            with open(self.config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            logger.info("Config loaded from %s", self.config_path)
+            return config
+        except Exception as e:
+            logger.error("Error loading config: %s", e)
+            sys.exit(1)
+
+    async def start(self):
+        """Start the VSTRU trading bot"""
+        try:
+            logger.info("=" * 80)
+            logger.info("STARTING VSTRU TRADING BOT")
+            logger.info("=" * 80)
+
+            self.start_time = time.time()
+            self.running = True
+
+            # Initialize paper trader
+            exchange_config = self.config.get('exchange', {})
+            api_key = exchange_config.get('api_key')
+            api_secret = exchange_config.get('api_secret')
+            testnet = exchange_config.get('testnet', True)
+            commission_rate = exchange_config.get('commission_rate', 0.0006)
+
+            logger.info("API Key: %s", api_key[:10] + "...")
+            logger.info("Testnet: %s", testnet)
+            logger.info("Commission: %.4f", commission_rate)
+
+            self.paper_trader = BybitPaperTrader(
+                api_key=api_key,
+                api_secret=api_secret,
+                initial_balance=10000.0,
+                testnet=testnet,
+                commission_rate=commission_rate,
+                signal_config=self.config
+            )
+
+            # Subscribe to symbols
+            symbols = self.config.get('symbols', self.symbols)
+            logger.info("Subscribing to: %s", symbols)
+
+            # Start paper trader with symbols (it will subscribe automatically)
+            await self.paper_trader.start(symbols=symbols)
+
+            logger.info("Bot started successfully")
+            logger.info("VSTRU Strategy active - Signals every 15 minutes")
+            logger.info("=" * 80)
+
+            # Start VSTRU signal generation loop in parallel
+            vstru_task = asyncio.create_task(self._vstru_signal_loop())
+            logger.info("VSTRU signal loop task created")
+
+            # Keep running indefinitely
+            await vstru_task
+
+        except Exception as e:
+            logger.error("Error starting bot: %s", e)
+            import traceback
+            traceback.print_exc()
+            raise
+
+    async def _vstru_signal_loop(self):
+        """Main loop for VSTRU signal generation"""
+        logger.info("Starting VSTRU signal generation loop...")
+
+        # Wait for price data to be available
+        logger.info("Waiting for price data from WebSocket...")
+        await asyncio.sleep(5)
+
+        # Generate initial signals immediately for testing
+        logger.info("Generating INITIAL test signals...")
+        for symbol in self.symbols:
+            await self._generate_vstru_signal(symbol)
+            self.last_signal_time[symbol] = time.time()
+            await asyncio.sleep(2)
+
+        logger.info("Initial signals generated. Next signals in %s seconds", self.signal_interval)
+
+        while self.running:
+            try:
+                current_time = time.time()
+
+                for symbol in self.symbols:
+                    # Check if it's time to generate signal
+                    last_signal = self.last_signal_time.get(symbol, 0)
+                    time_since_last = current_time - last_signal
+
+                    if time_since_last >= self.signal_interval:
+                        await self._generate_vstru_signal(symbol)
+                        self.last_signal_time[symbol] = current_time
+
+                # Wait 10 seconds before next check
+                await asyncio.sleep(10)
+
+            except Exception as e:
+                logger.error("Error in VSTRU loop: %s", e)
+                import traceback
+                traceback.print_exc()
+
+    async def _generate_vstru_signal(self, symbol: str):
+        """Generate VSTRU signal for symbol"""
+        try:
+            # Get current price
+            price = self.paper_trader.current_prices.get(symbol, 0.0)
+
+            if price == 0.0:
+                logger.warning("No price data for %s, skipping signal", symbol)
+                return
+
+            # Alternate BUY/SELL
+            signal_type = 'BUY' if self.signal_counter % 2 == 0 else 'SELL'
+            self.signal_counter += 1
+
+            # Create trading signal
+            signal = TradingSignal(
+                symbol=symbol,
+                signal_type=signal_type,
+                confidence=0.75,
+                price=price,
+                strategy='VSTRUStrategy',
+                timestamp=time.time(),
+                indicators={
+                    'vstru_cycle': self.signal_counter,
+                    'test_mode': True,
+                    'interval': '15min'
+                },
+                metadata={
+                    'source': 'VSTRU',
+                    'purpose': 'testnet_validation'
+                }
+            )
+
+            logger.info("=" * 80)
+            logger.info("VSTRU SIGNAL #%s", self.signal_counter)
+            logger.info("   Symbol: %s", symbol)
+            logger.info("   Type: %s", signal_type)
+            logger.info("   Price: $%.2f", price)
+            logger.info("   Confidence: %.2f", signal.confidence)
+            logger.info("   Time: %s", datetime.now(timezone.utc).isoformat())
+            logger.info("=" * 80)
+
+            # Send signal to paper trader
+            if hasattr(self.paper_trader, '_on_signal_received'):
+                self.paper_trader._on_signal_received(signal)
+            else:
+                logger.error("Paper trader does not have _on_signal_received method")
+
+        except Exception as e:
+            logger.error("Error generating VSTRU signal: %s", e)
+            import traceback
+            traceback.print_exc()
+
+    async def stop(self):
+        """Stop the bot"""
+        logger.info("Stopping VSTRU bot...")
+        self.running = False
+
+        if self.paper_trader:
+            await self.paper_trader.stop()
+
+        if self.start_time:
+            runtime = time.time() - self.start_time
+            hours = runtime / 3600
+            logger.info("Bot ran for %.2f hours", hours)
+            logger.info("Total signals generated: %s", self.signal_counter)
+
+    def get_status(self):
+        """Get bot status"""
+        status = {
+            'running': self.running,
+            'signals_generated': self.signal_counter,
+            'symbols': self.symbols,
+            'signal_interval': self.signal_interval
+        }
+
+        if self.start_time:
+            runtime = time.time() - self.start_time
+            status['runtime_hours'] = runtime / 3600
+            status['start_time'] = datetime.fromtimestamp(self.start_time, tz=timezone.utc).isoformat()
+
+        if self.paper_trader:
+            status['balance'] = self.paper_trader.balance
+            status['positions'] = len(self.paper_trader.positions)
+            status['orders'] = len(self.paper_trader.orders)
+
+        return status
+
+
+async def main():
+    """Main entry point"""
+    bot = VSTRUTradingBot()
+
+    # Signal handlers for graceful shutdown
+    def signal_handler(signum, frame):
+        logger.info("Received signal %s, shutting down...", signum)
+        asyncio.create_task(bot.stop())
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    try:
+        await bot.start()
+    except KeyboardInterrupt:
+        logger.info("Keyboard interrupt received")
+    except Exception as e:
+        logger.error("Fatal error: %s", e)
+        import traceback
+        traceback.print_exc()
+    finally:
+        await bot.stop()
+        logger.info("Bot stopped")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

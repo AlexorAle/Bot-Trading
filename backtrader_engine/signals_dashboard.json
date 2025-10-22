@@ -1,0 +1,200 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Trading Signals Dashboard - 72h Analysis",
+    "tags": ["trading", "signals", "72h"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Signal Generation Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(paper_signals_generated_total[5m])",
+            "legendFormat": "Signals/min"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.1},
+                {"color": "red", "value": 0.2}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Signal Execution Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(paper_signals_executed_total[5m])",
+            "legendFormat": "Executed/min"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.05},
+                {"color": "red", "value": 0.1}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Signal Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(paper_signals_executed_total[1h]) / rate(paper_signals_generated_total[1h]) * 100",
+            "legendFormat": "Success %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 80}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Signals by Strategy",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (strategy) (paper_signals_generated_total)",
+            "legendFormat": "{{strategy}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "Signal Confidence Distribution",
+        "type": "histogram",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.5, rate(paper_signal_confidence_bucket[5m]))",
+            "legendFormat": "50th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.9, rate(paper_signal_confidence_bucket[5m]))",
+            "legendFormat": "90th percentile"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Signals by Symbol",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "sum by (symbol) (paper_signals_generated_total)",
+            "legendFormat": "{{symbol}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 7,
+        "title": "Signal Generation Timeline",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(paper_signals_generated_total[1m])",
+            "legendFormat": "Generated - {{strategy}}"
+          },
+          {
+            "expr": "rate(paper_signals_executed_total[1m])",
+            "legendFormat": "Executed - {{strategy}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+      },
+      {
+        "id": 8,
+        "title": "Signal Rejection Reasons",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "sum by (reason) (paper_signals_rejected_total)",
+            "legendFormat": "{{reason}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 9,
+        "title": "Strategy Performance Comparison",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(paper_trades_total[1h]) * 100",
+            "legendFormat": "Trades/hour - {{strategy}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 10,
+        "title": "Signal Quality Metrics",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(paper_signal_confidence)",
+            "legendFormat": "Avg Confidence"
+          },
+          {
+            "expr": "max(paper_signal_confidence)",
+            "legendFormat": "Max Confidence"
+          },
+          {
+            "expr": "min(paper_signal_confidence)",
+            "legendFormat": "Min Confidence"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32}
+      }
+    ],
+    "time": {
+      "from": "now-72h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 1,
+    "links": []
+  }
+}
+
+

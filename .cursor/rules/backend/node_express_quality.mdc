@@ -1,0 +1,17 @@
+---
+description: "Express TS: calidad API, tipado estricto y métricas."
+globs:
+  - "backend/**"
+  - "server/**"
+alwaysApply: false
+visibility: "auto"
+examples:
+  valid:
+    - "Handlers tipados y errores centralizados con middleware."
+  invalid:
+    - "`any` implícito o sin `strict: true`."
+---
+# Requisitos
+- `GET /healthz` y `GET /metrics` con `prom-client`.
+- `tsconfig` con `strict: true`.
+- ESLint + Prettier; tests con Vitest/Jest.

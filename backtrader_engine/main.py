@@ -32,11 +32,12 @@ try:
     parent_dir = Path(__file__).parent.parent
     sys.path.insert(0, str(parent_dir))
     
-    from monitoring.bot_monitor import get_monitor
-    from monitoring.metrics_server import start_metrics_server
+    # TEMPORARILY DISABLED - will be fixed
+    # from monitoring.bot_monitor import get_monitor
+    # from monitoring.metrics_server import start_metrics_server
     from prometheus_client import start_http_server, Gauge, Counter, Histogram
     MONITORING_AVAILABLE = True
-    print("✅ Monitoring system available")
+    print("✅ Monitoring system available (partial)")
 except ImportError as e:
     print(f"⚠️ Monitoring system not available: {e}")
     MONITORING_AVAILABLE = False
@@ -546,21 +547,21 @@ def main():
             print("🚀 Prometheus metrics server started on port 8000")
             
             # Start legacy metrics server on port 8080
-            start_metrics_server(port=8080)
+            # start_metrics_server(port=8080) # This line was commented out in the new_code, so it's commented out here.
             
             # Get monitor instance
-            monitor = get_monitor()
+            # monitor = get_monitor() # This line was commented out in the new_code, so it's commented out here.
             
             # Register bot
             strategy_name = config.get('strategy', 'UnknownStrategy')
             symbol = config.get('symbol', 'UnknownSymbol')
-            monitor.register_bot(
-                bot_id=f"backtrader_{strategy_name}_{symbol.replace('/', '_')}",
-                bot_type="backtesting",
-                config=config
-            )
+            # monitor.register_bot( # This line was commented out in the new_code, so it's commented out here.
+            #     bot_id=f"backtrader_{strategy_name}_{symbol.replace('/', '_')}",
+            #     bot_type="backtesting",
+            #     config=config
+            # )
             
-            print("✅ Monitoring system initialized")
+            print("✅ Monitoring system initialized (partial)")
         except Exception as e:
             print(f"⚠️ Failed to initialize monitoring: {e}")
             monitor = None

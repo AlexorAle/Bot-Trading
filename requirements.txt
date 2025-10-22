@@ -19,5 +19,8 @@ schedule==1.2.2
 streamlit==1.50.0
 optuna==3.6.1
 backtrader==1.9.78.123
+ccxt==4.1.77
+websockets==13.1
+python-dotenv==1.0.1
 
 

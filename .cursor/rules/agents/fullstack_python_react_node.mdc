@@ -1,0 +1,37 @@
+---
+description: "Agente Full-Stack: Python(FastAPI), Node(Express TS), React/Next.js 14+, testing, lint, DX y despliegue."
+globs:
+  - "**/*"
+alwaysApply: false
+visibility: "agent"
+examples:
+  valid:
+    - "Agregar `/healthz` y `/metrics`; pruebas unitarias mínimas."
+    - "Usar Dockerfile multi-stage y compose con healthcheck."
+  invalid:
+    - "Añadir dependencias sin justificar."
+    - "Ignorar linting o cobertura mínima."
+---
+# Objetivo
+Implementa y mejora código **end-to-end** con calidad de producción.
+
+# Backend Python (FastAPI)
+- Estructura: `app/main.py`, `app/api`, `app/services`, `app/models`.
+- Tipado: Python 3.11+; valida env con `pydantic-settings`.
+- Testing: `pytest -q`, cobertura objetivo ≥80% (mínimo 60%).
+- Lint: `ruff check .` y `ruff format .`.
+- Métricas: `prometheus-fastapi-instrumentator` y `GET /metrics`.
+- Health: `GET /healthz` → `{"status":"ok"}`.
+
+# Backend Node (Express TS)
+- `strict: true` en `tsconfig`.
+- `eslint` + `prettier` + `vitest/jest`.
+- Endpoints: `GET /healthz`, `GET /metrics` con `prom-client`.
+
+# Frontend (Next.js 14+ App Router)
+- Server components por defecto; `use client` solo si hay estado/efectos.
+- Testing con `@testing-library/react`/`vitest` cuando aplique.
+
+# Despliegue
+- Dockerfile multi-stage; `docker compose` con `depends_on`, `healthcheck`.
+- Variables: `.env` con plantilla y validación en runtime.

@@ -1,0 +1,158 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Trading Signals Dashboard - 72h Analysis",
+    "tags": ["trading", "signals", "72h"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Signal Generation Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(paper_signals_generated_total[5m])",
+            "legendFormat": "Signals/min",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.1},
+                {"color": "red", "value": 0.2}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Signal Execution Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(paper_signals_executed_total[5m])",
+            "legendFormat": "Executed/min",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.05},
+                {"color": "red", "value": 0.1}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Signal Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(paper_signals_executed_total[1h]) / rate(paper_signals_generated_total[1h]) * 100",
+            "legendFormat": "Success %",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 80}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Signals by Strategy",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (strategy) (paper_signals_generated_total)",
+            "legendFormat": "{{strategy}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "Signal Generation Timeline",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(paper_signals_generated_total[1m])",
+            "legendFormat": "Generated - {{strategy}}",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(paper_signals_executed_total[1m])",
+            "legendFormat": "Executed - {{strategy}}",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Signals by Symbol",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "sum by (symbol) (paper_signals_generated_total)",
+            "legendFormat": "{{symbol}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 7,
+        "title": "Strategy Performance Comparison",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(paper_trades_total[1h]) * 100",
+            "legendFormat": "Trades/hour - {{strategy}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      }
+    ],
+    "time": {
+      "from": "now-72h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 1,
+    "links": []
+  }
+}

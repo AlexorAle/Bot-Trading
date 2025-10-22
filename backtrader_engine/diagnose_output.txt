@@ -1,0 +1,17 @@
+
+================================================================================
+BOT DIAGNOSTIC REPORT
+================================================================================
+
+[1] CHECKING PYTHON ENVIRONMENT
+    Python: 3.11.3 (tags/v3.11.3:f3909b8, Apr  4 2023, 23:49:59) [MSC v.1934 64 bit (AMD64)]
+    Executable: C:\Users\bancon\AppData\Local\Programs\Python\Python311\python.exe
+
+[2] CHECKING DIRECTORIES
+Traceback (most recent call last):
+  File "C:\Mis_Proyectos\BOT Trading\backtrader_engine\diagnose_bot.py", line 33, in <module>
+    print(f"    {status} {d}")
+  File "C:\Users\bancon\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 4: character maps to <undefined>

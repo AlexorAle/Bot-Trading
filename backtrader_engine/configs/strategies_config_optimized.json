@@ -1,0 +1,125 @@
+{
+  "active_strategies": [
+    {
+      "name": "VolatilityBreakoutStrategy",
+      "enabled": true,
+      "symbols": ["ETHUSDT", "BTCUSDT", "SOLUSDT"],
+      "parameters": {
+        "lookback": 18,
+        "atr_period": 14,
+        "multiplier": 2.2,
+        "trailing_stop": 0.025,
+        "position_size": 0.08
+      },
+      "risk_limits": {
+        "max_position_size": 0.08,
+        "max_daily_trades": 8
+      },
+      "weight": 0.25,
+      "description": "Estrategia de breakout de volatilidad - OPTIMIZADA"
+    },
+    {
+      "name": "RSIEMAMomentumStrategy",
+      "enabled": true,
+      "symbols": ["ETHUSDT", "BTCUSDT", "SOLUSDT"],
+      "parameters": {
+        "rsi_period": 14,
+        "rsi_buy_threshold": 55,
+        "rsi_sell_threshold": 45,
+        "ema_period": 20,
+        "position_size": 0.08,
+        "take_profit": 0.030,
+        "stop_loss": 0.015
+      },
+      "risk_limits": {
+        "max_position_size": 0.08,
+        "max_daily_trades": 8
+      },
+      "weight": 0.25,
+      "description": "Estrategia de momentum RSI + EMA - OPTIMIZADA"
+    },
+    {
+      "name": "BollingerReversionStrategy",
+      "enabled": true,
+      "symbols": ["ETHUSDT", "BTCUSDT", "SOLUSDT"],
+      "parameters": {
+        "bb_period": 20,
+        "std_dev": 2.0,
+        "position_size": 0.06,
+        "take_profit": 0.025,
+        "stop_loss": 0.012
+      },
+      "risk_limits": {
+        "max_position_size": 0.06,
+        "max_daily_trades": 6
+      },
+      "weight": 0.20,
+      "description": "Estrategia de reversión Bollinger Bands - OPTIMIZADA"
+    },
+    {
+      "name": "EMABreakoutConservativeStrategy",
+      "enabled": true,
+      "symbols": ["ETHUSDT", "BTCUSDT", "SOLUSDT"],
+      "parameters": {
+        "ema_fast": 10,
+        "ema_slow": 30,
+        "atr_period": 14,
+        "atr_multiplier": 1.8,
+        "position_size": 0.08,
+        "take_profit": 0.028,
+        "stop_loss": 0.018
+      },
+      "risk_limits": {
+        "max_position_size": 0.08,
+        "max_daily_trades": 8
+      },
+      "weight": 0.20,
+      "description": "Estrategia conservadora de breakout EMA - OPTIMIZADA"
+    },
+    {
+      "name": "ContrarianVolumeSpikeStrategy",
+      "enabled": true,
+      "symbols": ["ETHUSDT", "BTCUSDT", "SOLUSDT"],
+      "parameters": {
+        "volume_period": 20,
+        "volume_threshold": 1.8,
+        "rsi_period": 14,
+        "rsi_oversold": 25,
+        "rsi_overbought": 75,
+        "position_size": 0.06,
+        "take_profit": 0.022,
+        "stop_loss": 0.012
+      },
+      "risk_limits": {
+        "max_position_size": 0.06,
+        "max_daily_trades": 6
+      },
+      "weight": 0.10,
+      "description": "Estrategia contraria basada en volumen - OPTIMIZADA"
+    }
+  ],
+    "signal_filters": {
+    "min_confidence": 0.60,
+    "throttle_seconds": 30,
+    "max_signals_per_hour": 15,
+    "max_signals_per_strategy_per_hour": 3,
+    "max_signals_per_symbol_per_hour": 5
+  },
+  "portfolio": {
+    "total_position_limit": 0.4,
+    "max_correlation": 0.7,
+    "rebalance_hours": 6,
+    "diversification_enabled": true
+  },
+  "engine_config": {
+    "buffer_size": 500,
+    "update_interval": 3,
+    "max_indicators_age": 7200,
+    "signal_aggregation": true
+  },
+  "monitoring": {
+    "detailed_logging": true,
+    "performance_tracking": true,
+    "strategy_attribution": true
+  }
+}

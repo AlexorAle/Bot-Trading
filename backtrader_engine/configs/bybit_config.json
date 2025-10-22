@@ -1,0 +1,55 @@
+{
+  "exchange": {
+    "name": "bybit",
+    "testnet": true,
+    "api_key": "RGsF3mGYBxloK5k2P8",
+    "api_secret": "5OujyPCj3i4gU0eCvFZJ1XAAX68YePJQrgd1",
+    "commission_rate": 0.0006,
+    "rate_limit": {
+      "requests_per_second": 10,
+      "requests_per_minute": 1200
+    }
+  },
+  "paper_trading": {
+    "enabled": true,
+    "initial_balance": 10000.0,
+    "max_position_size": 0.1,
+    "risk_management": {
+      "max_drawdown": 0.05,
+      "stop_loss": 0.02,
+      "take_profit": 0.04
+    }
+  },
+  "symbols": {
+    "primary": "ETHUSDT",
+    "secondary": ["BTCUSDT", "SOLUSDT"],
+    "timeframe": "15m"
+  },
+  "websocket": {
+    "enabled": true,
+    "reconnect_attempts": 5,
+    "reconnect_delay": 5,
+    "subscriptions": {
+      "tickers": true,
+      "orderbook": true,
+      "orders": true,
+      "positions": true
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics_port": 8080,
+    "update_interval": 5,
+    "alerts": {
+      "balance_change": 0.01,
+      "position_change": 0.05,
+      "error_threshold": 3
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/paper_trading.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  }
+}

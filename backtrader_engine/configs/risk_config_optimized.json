@@ -1,0 +1,35 @@
+{
+  "risk_limits": {
+    "max_position_size": 0.1,
+    "max_daily_trades": 10,
+    "max_daily_loss": 0.05,
+    "max_drawdown": 0.10,
+    "min_confidence": 0.60,
+    "max_volatility": 0.05,
+    "min_volume_ratio": 0.8,
+    "max_correlation": 0.8
+  },
+  "market_conditions": {
+    "suitable_regimes": ["trending", "ranging", "neutral"],
+    "volatility_thresholds": {
+      "low": 0.02,
+      "medium": 0.03,
+      "high": 0.05
+    },
+    "volume_thresholds": {
+      "min_ratio": 0.8,
+      "optimal_ratio": 1.2
+    }
+  },
+  "backup": {
+    "enabled": true,
+    "interval_minutes": 30,
+    "max_backups": 24,
+    "backup_path": "backups/risk_backups/"
+  },
+  "alerts": {
+    "risk_breach": true,
+    "daily_summary": true,
+    "market_regime_change": true
+  }
+}

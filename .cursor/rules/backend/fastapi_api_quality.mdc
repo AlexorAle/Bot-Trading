@@ -1,0 +1,19 @@
+---
+description: "FastAPI: calidad API, validación, métricas y estructura."
+globs:
+  - "backend/**"
+  - "app/**"
+alwaysApply: false
+visibility: "auto"
+examples:
+  valid:
+    - "Usar `pydantic` y manejo centralizado de errores."
+  invalid:
+    - "Endpoints sin tipado o respuestas sin modelo."
+---
+# Requisitos
+- `GET /healthz` devuelve `{"status":"ok"}`.
+- `GET /metrics` expone métricas Prometheus.
+- Manejo de errores con `HTTPException`/middleware.
+- DTOs pydantic para request/response; status codes correctos.
+- Logging estructurado.
