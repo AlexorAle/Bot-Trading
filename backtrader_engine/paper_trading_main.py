@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 # Import trading engine
 from exchanges.bybit_paper_trader import BybitPaperTrader
 from signal_engine import TradingSignal
+from alert_manager import AlertManager
 
 class VSTRUTradingBot:
     """
@@ -53,9 +54,32 @@ class VSTRUTradingBot:
         self.signal_interval = 900  # 15 minutes in seconds
         self.symbols = ['ETHUSDT', 'BTCUSDT', 'SOLUSDT']
         
+        # Initialize AlertManager with Telegram
+        self.alert_manager = self._init_alert_manager()
+        
         logger.info("VSTRUTradingBot initialized")
         logger.info(f"Symbols: {self.symbols}")
         logger.info(f"Signal interval: {self.signal_interval}s (15 minutes)")
+    
+    def _init_alert_manager(self):
+        """Initialize AlertManager with Telegram notifications"""
+        try:
+            alert_config_path = Path(__file__).parent / 'configs' / 'alert_config.json'
+            with open(alert_config_path, 'r') as f:
+                alert_config = json.load(f)
+            
+            # Merge alerts and telegram config
+            config = {
+                **alert_config.get('alerts', {}),
+                'telegram': alert_config.get('telegram', {})
+            }
+            
+            alert_manager = AlertManager(config)
+            logger.info("AlertManager initialized with Telegram support")
+            return alert_manager
+        except Exception as e:
+            logger.error(f"Error initializing AlertManager: {e}")
+            return None
     
     def _load_config(self):
         """Load configuration from JSON"""
@@ -108,6 +132,11 @@ class VSTRUTradingBot:
             logger.info("Bot started successfully")
             logger.info("VSTRU Strategy active - Signals every 15 minutes")
             logger.info("=" * 80)
+            
+            # Send Telegram notification
+            if self.alert_manager:
+                config_info = f"Symbols: {', '.join(self.symbols)} | Signal interval: 15min"
+                self.alert_manager.bot_started(config_info)
             
             # Start VSTRU signal generation loop in parallel
             vstru_task = asyncio.create_task(self._vstru_signal_loop())
@@ -220,6 +249,13 @@ class VSTRUTradingBot:
         """Stop the bot"""
         logger.info("Stopping VSTRU bot...")
         self.running = False
+        
+        # Send Telegram notification
+        if self.alert_manager and self.start_time:
+            runtime = time.time() - self.start_time
+            hours = runtime / 3600
+            reason = f"Runtime: {hours:.2f}h | Signals: {self.signal_counter}"
+            self.alert_manager.bot_stopped(reason)
         
         if self.paper_trader:
             await self.paper_trader.stop()
