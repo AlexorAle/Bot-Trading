@@ -67,10 +67,10 @@ class TelegramNotifier:
             
             if response.status_code == 200:
                 self.last_message_time = time.time()
-                logger.debug("Telegram message sent successfully")
+                logger.info("✅ Telegram message sent successfully")
                 return True
             else:
-                logger.error(f"Failed to send Telegram message: {response.status_code} - {response.text}")
+                logger.error(f"❌ Failed to send Telegram message: {response.status_code} - {response.text}")
                 return False
                 
         except requests.exceptions.RequestException as e:

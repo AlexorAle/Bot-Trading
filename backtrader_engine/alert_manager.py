@@ -129,7 +129,9 @@ class AlertManager:
             try:
                 from telegram_notifier import TelegramNotifier
                 self.telegram_notifier = TelegramNotifier(config.get('telegram', {}))
-                logger.info("Telegram notifier initialized")
+                # Add Telegram notifier to the notifiers list
+                self.notifiers.append(self.telegram_notifier.send_alert)
+                logger.info("Telegram notifier initialized and added to notifiers list")
             except Exception as e:
                 logger.error(f"Failed to initialize Telegram notifier: {e}")
     
