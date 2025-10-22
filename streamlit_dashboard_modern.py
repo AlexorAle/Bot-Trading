@@ -118,13 +118,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def is_bot_running():
-    """Verifica si el bot está ejecutándose"""
+    """Verifica si el bot está ejecutándose (soporta Windows y Linux)"""
     try:
         for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
-            if proc.info['name'] == 'python.exe':
-                cmdline = ' '.join(proc.info['cmdline']) if proc.info['cmdline'] else ''
-                if 'paper_trading_main.py' in cmdline:
-                    return True, proc.info['pid']
+            try:
+                proc_name = proc.info.get('name', '')
+                # Soportar tanto Windows (python.exe) como Linux (python, python3)
+                if proc_name in ['python.exe', 'python', 'python3']:
+                    cmdline = ' '.join(proc.info['cmdline']) if proc.info['cmdline'] else ''
+                    if 'paper_trading_main.py' in cmdline:
+                        return True, proc.info['pid']
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
         return False, None
     except Exception as e:
         return False, None
@@ -158,45 +163,62 @@ def read_logs():
         return []
 
 def start_bot():
-    """Inicia el bot usando el script corregido"""
+    """Inicia el bot de trading"""
     try:
-        # Usar ruta absoluta para Windows
-        script_path = os.path.join(os.getcwd(), "executables", "start_bot_fixed.bat")
-        result = subprocess.Popen(
-            [script_path], 
-            shell=True,
-            cwd=os.getcwd(),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+        # Buscar proceso de paper_trading_main.py
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                cmdline = proc.info.get('cmdline', [])
+                if cmdline and 'paper_trading_main.py' in ' '.join(cmdline):
+                    return False  # Ya está corriendo
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+        
+        # Usar el entorno virtual del bot
+        venv_python = os.path.join(os.getcwd(), "venv", "bin", "python")
+        bot_script = os.path.join(os.getcwd(), "backtrader_engine", "paper_trading_main.py")
+        bot_dir = os.path.join(os.getcwd(), "backtrader_engine")
+        
+        if not os.path.exists(bot_script):
+            st.error(f"Script no encontrado: {bot_script}")
+            return False
+        
+        if not os.path.exists(venv_python):
+            # Si no hay venv, usar python3 del sistema
+            venv_python = "python3"
+        
+        # Iniciar proceso en background
+        subprocess.Popen(
+            [venv_python, bot_script],
+            cwd=bot_dir,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True
         )
-        # Esperar a que termine el script
-        result.wait(timeout=45)
-        return result.returncode == 0
-    except subprocess.TimeoutExpired:
-        st.error("Timeout: El script tardó demasiado en ejecutarse")
-        return False
+        time.sleep(2)  # Esperar a que inicie
+        return True
     except Exception as e:
         st.error(f"Error iniciando bot: {e}")
         return False
 
 def stop_bot():
-    """Detiene el bot usando el script corregido"""
+    """Detiene el bot de trading"""
     try:
-        # Usar ruta absoluta para Windows
-        script_path = os.path.join(os.getcwd(), "executables", "stop_bot_fixed.bat")
-        result = subprocess.Popen(
-            [script_path], 
-            shell=True,
-            cwd=os.getcwd(),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-        # Esperar a que termine el script
-        result.wait(timeout=45)
-        return result.returncode == 0
-    except subprocess.TimeoutExpired:
-        st.error("Timeout: El script tardó demasiado en ejecutarse")
-        return False
+        # Buscar y detener proceso de paper_trading_main.py
+        found = False
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                cmdline = proc.info.get('cmdline', [])
+                if cmdline and 'paper_trading_main.py' in ' '.join(cmdline):
+                    proc.terminate()
+                    try:
+                        proc.wait(timeout=10)
+                    except psutil.TimeoutExpired:
+                        proc.kill()
+                    found = True
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+        return found
     except Exception as e:
         st.error(f"Error deteniendo bot: {e}")
         return False
@@ -210,11 +232,69 @@ def check_service_status(url, timeout=3):
         return False
 
 # Header principal
-st.markdown("# 🤖 Trading Bot Command Center")
+st.markdown("<h1 style='text-align: center;'>🤖 COMMAND CENTER</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ========================================
-# LAYOUT PRINCIPAL: 2 COLUMNAS (50% - 50%)
+# PANEL SUPERIOR: ESTADO DE TODOS LOS SERVICIOS
+# ========================================
+st.markdown("## 📊 System Status Overview")
+
+# Obtener estados
+bot_running, bot_pid = is_bot_running()
+investment_status = investment_manager.get_status()
+prometheus_status = check_service_status("http://127.0.0.1:9090")
+grafana_status = check_service_status("http://127.0.0.1:3000")
+metrics_api_status = check_service_status("http://127.0.0.1:8080/metrics")
+
+# Grid de servicios (6 columnas)
+service_cols = st.columns(6)
+
+services_data = [
+    {"name": "Trading Bot", "status": bot_running, "icon": "🤖", "port": "-"},
+    {"name": "Investment Backend", "status": investment_status['backend']['status'] == 'running', "icon": "🔧", "port": "8000"},
+    {"name": "Investment Frontend", "status": investment_status['frontend']['status'] == 'running', "icon": "🌐", "port": "3000"},
+    {"name": "Prometheus", "status": prometheus_status, "icon": "📊", "port": "9090"},
+    {"name": "Grafana", "status": grafana_status, "icon": "📈", "port": "3000"},
+    {"name": "Metrics API", "status": metrics_api_status, "icon": "🔌", "port": "8080"},
+]
+
+for idx, (col, service) in enumerate(zip(service_cols, services_data)):
+    with col:
+        status_emoji = "🟢" if service["status"] else "🔴"
+        status_color = "#10b981" if service["status"] else "#ef4444"
+        status_text = "ONLINE" if service["status"] else "OFFLINE"
+        
+        st.markdown(f"""
+        <div style="
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        ">
+            <div style="font-size: 2rem;">{service["icon"]}</div>
+            <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin: 5px 0;">
+                {service["name"]}
+            </div>
+            <div style="font-size: 1.5rem;">{status_emoji}</div>
+            <div style="color: {status_color}; font-size: 0.7rem; font-weight: 600;">
+                {status_text}
+            </div>
+            {f'<div style="font-size: 0.65rem; color: rgba(255, 255, 255, 0.5);">:{service["port"]}</div>' if service["port"] != "-" else ''}
+        </div>
+        """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("---")
+
+# ========================================
+# PANEL INFERIOR: BOT DE TRADING (izq) | LOGS (der)
 # ========================================
 main_col_left, main_col_right = st.columns([1, 1])
 
@@ -222,8 +302,7 @@ main_col_left, main_col_right = st.columns([1, 1])
 # COLUMNA IZQUIERDA: BOT DE TRADING
 # ========================================
 with main_col_left:
-    st.markdown("## 📦 Bot de Trading")
-    st.markdown("---")
+    st.markdown("## 🤖 Trading Bot Control")
     
     # Estado del bot y métricas principales
     bot_running, bot_pid = is_bot_running()
@@ -336,121 +415,94 @@ with main_col_left:
         st.success("📄 **MODO DEMO ACTIVO**")
     else:
         st.error("⚠️ **MODO LIVE**")
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Backend Logs
-    st.markdown("### 📋 Backend Logs")
-    logs = read_logs()
-    if logs:
-        log_text = "".join(logs[-5:])  # Últimas 5 líneas
-        st.code(log_text, language=None)
-    else:
-        st.info("No logs available")
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # System Health
-    st.markdown("### 🔧 System Health")
-    
-    services = {
-        "Prometheus": ("http://127.0.0.1:9090", "📊"),
-        "Grafana": ("http://127.0.0.1:3000", "📈"),
-        "Metrics API": ("http://127.0.0.1:8080/metrics", "🔌")
-    }
-    
-    for service_name, (url, icon) in services.items():
-        status = check_service_status(url)
-        col_service, col_status = st.columns([3, 1])
-        with col_service:
-            st.markdown(f"{icon} **{service_name}**")
-        with col_status:
-            if status:
-                st.markdown("🟢")
-            else:
-                st.markdown("🔴")
 
 # ========================================
-# COLUMNA DERECHA: INVESTMENT DASHBOARD
+# COLUMNA DERECHA: LOGS DETALLADOS
 # ========================================
 with main_col_right:
-    st.markdown("## 💼 Investment Dashboard")
-    st.markdown("---")
+    st.markdown("## 📋 System Logs")
     
-    # Obtener estado del Investment Dashboard
+    # Tabs para diferentes logs
+    log_tabs = st.tabs(["🤖 Trading Bot", "🔧 Investment Backend", "🌐 Investment Frontend"])
+    
+    # Tab 1: Trading Bot Logs
+    with log_tabs[0]:
+        trading_logs = read_logs()
+        if trading_logs:
+            log_text = "".join(trading_logs[-20:])  # Últimas 20 líneas
+            st.code(log_text, language="log", line_numbers=False)
+        else:
+            st.info("No logs available for Trading Bot")
+        
+        if st.button("📥 Download Full Log", key="download_trading_log"):
+            try:
+                log_file = "backtrader_engine/logs/paper_trading.log"
+                if os.path.exists(log_file):
+                    with open(log_file, 'r') as f:
+                        st.download_button(
+                            label="💾 Download",
+                            data=f.read(),
+                            file_name="trading_bot.log",
+                            mime="text/plain"
+                        )
+            except Exception as e:
+                st.error(f"Error: {e}")
+    
+    # Tab 2: Investment Backend Logs
+    with log_tabs[1]:
+        backend_log_file = "/home/alex/proyectos/investment-dashboard/logs/backend.log"
+        if os.path.exists(backend_log_file):
+            with open(backend_log_file, 'r') as f:
+                lines = f.readlines()
+                log_text = "".join(lines[-20:])  # Últimas 20 líneas
+                st.code(log_text, language="log", line_numbers=False)
+        else:
+            st.info("No logs available for Investment Backend")
+    
+    # Tab 3: Investment Frontend Logs
+    with log_tabs[2]:
+        frontend_log_file = "/home/alex/proyectos/investment-dashboard/logs/frontend.log"
+        if os.path.exists(frontend_log_file):
+            with open(frontend_log_file, 'r') as f:
+                lines = f.readlines()
+                log_text = "".join(lines[-20:])  # Últimas 20 líneas
+                st.code(log_text, language="log", line_numbers=False)
+        else:
+            st.info("No logs available for Investment Frontend")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Investment Dashboard Control (compacto)
+    st.markdown("### 💼 Investment Dashboard Control")
+    
+    # Obtener estado
     investment_status = investment_manager.get_status()
     overall_status = investment_status['overall_status']
     backend_info = investment_status['backend']
     frontend_info = investment_status['frontend']
     
-    # Estado General
+    # Estado General (compacto)
     if overall_status == "running":
-        status_color = "#10b981"
-        status_text = "RUNNING"
-        status_icon = "status-active"
         status_emoji = "🟢"
+        status_text = "RUNNING"
     elif overall_status == "partial":
-        status_color = "#f59e0b"
-        status_text = "PARTIAL"
-        status_icon = "status-active"
         status_emoji = "🟡"
+        status_text = "PARTIAL"
     else:
-        status_color = "#ef4444"
-        status_text = "OFFLINE"
-        status_icon = "status-inactive"
         status_emoji = "🔴"
+        status_text = "OFFLINE"
     
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">💼 Investment Status</div>
-        <div style="display: flex; align-items: center; margin-top: 15px;">
-            <span class="{status_icon}"></span>
-            <span style="color: {status_color}; font-size: 1.5rem; font-weight: 600;">{status_text}</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"**Status:** {status_emoji} {status_text}")
     
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Status compacto de servicios
+    backend_status_emoji = "🟢" if backend_info.get('status') == 'running' else "🔴"
+    frontend_status_emoji = "🟢" if frontend_info.get('status') == 'running' else "🔴"
     
-    # Backend Status
-    st.markdown("### 🔧 Backend (Puerto 8000)")
-    backend_status = backend_info.get('status', 'stopped')
-    
-    if backend_status == "running":
-        backend_pid = backend_info.get('pid', 'N/A')
-        backend_uptime = backend_info.get('uptime', 'N/A')
-        backend_memory = backend_info.get('memory_mb', 0)
-        
-        col_b1, col_b2 = st.columns([1, 1])
-        with col_b1:
-            st.metric("Status", "🟢 Running")
-            st.metric("PID", backend_pid)
-        with col_b2:
-            st.metric("Uptime", backend_uptime)
-            st.metric("Memory", f"{backend_memory:.1f} MB")
-    else:
-        st.markdown("🔴 **Backend Detenido**")
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Frontend Status
-    st.markdown("### 🌐 Frontend (Puerto 3000)")
-    frontend_status = frontend_info.get('status', 'stopped')
-    
-    if frontend_status == "running":
-        frontend_pid = frontend_info.get('pid', 'N/A')
-        frontend_uptime = frontend_info.get('uptime', 'N/A')
-        frontend_memory = frontend_info.get('memory_mb', 0)
-        
-        col_f1, col_f2 = st.columns([1, 1])
-        with col_f1:
-            st.metric("Status", "🟢 Running")
-            st.metric("PID", frontend_pid)
-        with col_f2:
-            st.metric("Uptime", frontend_uptime)
-            st.metric("Memory", f"{frontend_memory:.1f} MB")
-    else:
-        st.markdown("🔴 **Frontend Detenido**")
+    col_inv1, col_inv2 = st.columns(2)
+    with col_inv1:
+        st.markdown(f"🔧 Backend: {backend_status_emoji}")
+    with col_inv2:
+        st.markdown(f"🌐 Frontend: {frontend_status_emoji}")
     
     st.markdown("<br>", unsafe_allow_html=True)
     

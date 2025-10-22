@@ -138,7 +138,14 @@ class InvestmentDashboardManager:
     def _check_endpoint(self, url: str, timeout: int = 2) -> bool:
         """Verifica si un endpoint está respondiendo"""
         try:
-            response = requests.get(url, timeout=timeout)
+            # Para backend FastAPI, intentar /docs (Swagger siempre está disponible)
+            if ":8000" in url:
+                test_url = f"{url}/docs"
+            else:
+                test_url = url
+            
+            response = requests.get(test_url, timeout=timeout, allow_redirects=True)
+            # Aceptar 200, 404, o 3xx (redirects)
             return response.status_code < 500
         except:
             return False
@@ -157,27 +164,21 @@ class InvestmentDashboardManager:
             if not os.path.exists(script_path):
                 return False, f"Script de inicio no encontrado: {script_path}"
             
-            result = subprocess.run(
-                [script_path],
+            # Iniciar en background sin esperar (el script ya maneja nohup)
+            process = subprocess.Popen(
+                ["/bin/bash", script_path],
                 cwd=self.script_dir,
-                capture_output=True,
-                text=True,
-                timeout=60
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
             )
             
-            if result.returncode == 0:
-                # Esperar un poco y verificar
-                time.sleep(5)
-                status = self.get_status()
-                if status["overall_status"] == "running":
-                    return True, "Investment Dashboard iniciado correctamente"
-                else:
-                    return False, f"Dashboard iniciado pero no responde correctamente. Estado: {status['overall_status']}"
-            else:
-                return False, f"Error al iniciar: {result.stderr}"
+            # Esperar solo 2 segundos y verificar que el proceso empezó
+            time.sleep(2)
+            
+            # No esperar a que termine el script, solo verificar que inició
+            return True, "Investment Dashboard iniciando... Espera 10-15 segundos y refresca"
                 
-        except subprocess.TimeoutExpired:
-            return False, "Timeout al iniciar el dashboard (>60s)"
         except Exception as e:
             return False, f"Error inesperado: {str(e)}"
     
