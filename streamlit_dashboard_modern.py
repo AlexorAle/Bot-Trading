@@ -267,26 +267,26 @@ for idx, (col, service) in enumerate(zip(service_cols, services_data)):
         
         st.markdown(f"""
         <div style="
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 20px 10px;
             text-align: center;
-            height: 140px;
+            height: 180px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: space-around;
         ">
-            <div style="font-size: 2rem;">{service["icon"]}</div>
-            <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin: 5px 0;">
+            <div style="font-size: 2.5rem; margin-bottom: 5px;">{service["icon"]}</div>
+            <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.85); font-weight: 500; margin: 8px 0;">
                 {service["name"]}
             </div>
-            <div style="font-size: 1.5rem;">{status_emoji}</div>
-            <div style="color: {status_color}; font-size: 0.7rem; font-weight: 600;">
+            <div style="font-size: 2rem; margin: 5px 0;">{status_emoji}</div>
+            <div style="color: {status_color}; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px;">
                 {status_text}
             </div>
-            {f'<div style="font-size: 0.65rem; color: rgba(255, 255, 255, 0.5);">:{service["port"]}</div>' if service["port"] != "-" else ''}
+            {f'<div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); margin-top: 5px;">Port: {service["port"]}</div>' if service["port"] != "-" else '<div style="height: 20px;"></div>'}
         </div>
         """, unsafe_allow_html=True)
 
@@ -294,7 +294,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ========================================
-# PANEL INFERIOR: BOT DE TRADING (izq) | LOGS (der)
+# PANEL INFERIOR: BOT DE TRADING (izq) | INVESTMENT DASHBOARD (der)
 # ========================================
 main_col_left, main_col_right = st.columns([1, 1])
 
@@ -415,65 +415,23 @@ with main_col_left:
         st.success("📄 **MODO DEMO ACTIVO**")
     else:
         st.error("⚠️ **MODO LIVE**")
-
-# ========================================
-# COLUMNA DERECHA: LOGS DETALLADOS
-# ========================================
-with main_col_right:
-    st.markdown("## 📋 System Logs")
-    
-    # Tabs para diferentes logs
-    log_tabs = st.tabs(["🤖 Trading Bot", "🔧 Investment Backend", "🌐 Investment Frontend"])
-    
-    # Tab 1: Trading Bot Logs
-    with log_tabs[0]:
-        trading_logs = read_logs()
-        if trading_logs:
-            log_text = "".join(trading_logs[-20:])  # Últimas 20 líneas
-            st.code(log_text, language="log", line_numbers=False)
-        else:
-            st.info("No logs available for Trading Bot")
-        
-        if st.button("📥 Download Full Log", key="download_trading_log"):
-            try:
-                log_file = "backtrader_engine/logs/paper_trading.log"
-                if os.path.exists(log_file):
-                    with open(log_file, 'r') as f:
-                        st.download_button(
-                            label="💾 Download",
-                            data=f.read(),
-                            file_name="trading_bot.log",
-                            mime="text/plain"
-                        )
-            except Exception as e:
-                st.error(f"Error: {e}")
-    
-    # Tab 2: Investment Backend Logs
-    with log_tabs[1]:
-        backend_log_file = "/home/alex/proyectos/investment-dashboard/logs/backend.log"
-        if os.path.exists(backend_log_file):
-            with open(backend_log_file, 'r') as f:
-                lines = f.readlines()
-                log_text = "".join(lines[-20:])  # Últimas 20 líneas
-                st.code(log_text, language="log", line_numbers=False)
-        else:
-            st.info("No logs available for Investment Backend")
-    
-    # Tab 3: Investment Frontend Logs
-    with log_tabs[2]:
-        frontend_log_file = "/home/alex/proyectos/investment-dashboard/logs/frontend.log"
-        if os.path.exists(frontend_log_file):
-            with open(frontend_log_file, 'r') as f:
-                lines = f.readlines()
-                log_text = "".join(lines[-20:])  # Últimas 20 líneas
-                st.code(log_text, language="log", line_numbers=False)
-        else:
-            st.info("No logs available for Investment Frontend")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Investment Dashboard Control (compacto)
-    st.markdown("### 💼 Investment Dashboard Control")
+    # Logs del Trading Bot
+    st.markdown("### 📋 Trading Bot Logs")
+    trading_logs = read_logs()
+    if trading_logs:
+        log_text = "".join(trading_logs[-10:])  # Últimas 10 líneas
+        st.code(log_text, language="log", line_numbers=False)
+    else:
+        st.info("No logs available")
+
+# ========================================
+# COLUMNA DERECHA: INVESTMENT DASHBOARD
+# ========================================
+with main_col_right:
+    st.markdown("## 💼 Investment Dashboard")
     
     # Obtener estado
     investment_status = investment_manager.get_status()
@@ -550,39 +508,33 @@ with main_col_right:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Logs Recientes
-    st.markdown("### 📋 Logs Recientes")
+    # Tabs para logs de Investment Dashboard
+    st.markdown("### 📋 Investment Logs")
+    log_tabs = st.tabs(["🔧 Backend", "🌐 Frontend"])
     
-    tab_backend, tab_frontend = st.tabs(["Backend", "Frontend"])
+    # Tab 1: Investment Backend Logs
+    with log_tabs[0]:
+        backend_log_file = "/home/alex/proyectos/investment-dashboard/logs/backend.log"
+        if os.path.exists(backend_log_file):
+            with open(backend_log_file, 'r') as f:
+                lines = f.readlines()
+                log_text = "".join(lines[-15:])  # Últimas 15 líneas
+                st.code(log_text, language="log", line_numbers=False)
+        else:
+            st.info("No logs available for Investment Backend")
     
-    with tab_backend:
-        backend_logs = investment_manager.get_logs("backend", lines=10)
-        st.code(backend_logs, language=None)
+    # Tab 2: Investment Frontend Logs
+    with log_tabs[1]:
+        frontend_log_file = "/home/alex/proyectos/investment-dashboard/logs/frontend.log"
+        if os.path.exists(frontend_log_file):
+            with open(frontend_log_file, 'r') as f:
+                lines = f.readlines()
+                log_text = "".join(lines[-15:])  # Últimas 15 líneas
+                st.code(log_text, language="log", line_numbers=False)
+        else:
+            st.info("No logs available for Investment Frontend")
     
-    with tab_frontend:
-        frontend_logs = investment_manager.get_logs("frontend", lines=10)
-        st.code(frontend_logs, language=None)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Enlaces Directos
-    st.markdown("### 🌐 Enlaces Directos")
-    
-    backend_url = "http://82.25.101.32:8000"
-    frontend_url = "http://82.25.101.32:3000"
-    
-    st.markdown(f"""
-    <div class="metric-card">
-        <div style="margin: 10px 0;">
-            🔗 <strong>Backend:</strong><br>
-            <a href="{backend_url}" target="_blank" style="color: #667eea;">{backend_url}</a>
-        </div>
-        <div style="margin: 10px 0;">
-            🔗 <strong>Frontend:</strong><br>
-            <a href="{frontend_url}" target="_blank" style="color: #667eea;">{frontend_url}</a>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+
 
 # Footer
 st.markdown("<br><br>", unsafe_allow_html=True)
