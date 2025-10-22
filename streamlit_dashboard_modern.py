@@ -163,64 +163,79 @@ def read_logs():
         return []
 
 def start_bot():
-    """Inicia el bot de trading"""
+    """Inicia el bot de trading usando el script de inicio"""
     try:
-        # Buscar proceso de paper_trading_main.py
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
-            try:
-                cmdline = proc.info.get('cmdline', [])
-                if cmdline and 'paper_trading_main.py' in ' '.join(cmdline):
-                    return False  # Ya está corriendo
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
-        
-        # Usar el entorno virtual del bot
-        venv_python = os.path.join(os.getcwd(), "venv", "bin", "python")
-        bot_script = os.path.join(os.getcwd(), "backtrader_engine", "paper_trading_main.py")
-        bot_dir = os.path.join(os.getcwd(), "backtrader_engine")
-        
-        if not os.path.exists(bot_script):
-            st.error(f"Script no encontrado: {bot_script}")
+        # Verificar si ya está corriendo
+        bot_running, _ = is_bot_running()
+        if bot_running:
+            st.warning("⚠️ Bot ya está corriendo")
             return False
         
-        if not os.path.exists(venv_python):
-            # Si no hay venv, usar python3 del sistema
-            venv_python = "python3"
+        # Ejecutar script de inicio
+        script_path = os.path.join(os.getcwd(), "scripts", "start_bot.sh")
         
-        # Iniciar proceso en background
-        subprocess.Popen(
-            [venv_python, bot_script],
-            cwd=bot_dir,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True
+        if not os.path.exists(script_path):
+            st.error(f"❌ Script de inicio no encontrado: {script_path}")
+            return False
+        
+        # Ejecutar script
+        result = subprocess.run(
+            ["/bin/bash", script_path],
+            capture_output=True,
+            text=True,
+            timeout=10
         )
-        time.sleep(2)  # Esperar a que inicie
-        return True
+        
+        if result.returncode == 0:
+            st.success("✅ Bot iniciado correctamente")
+            return True
+        else:
+            st.error(f"❌ Error al iniciar bot:\n{result.stderr}")
+            return False
+            
+    except subprocess.TimeoutExpired:
+        st.error("❌ Timeout al iniciar el bot")
+        return False
     except Exception as e:
-        st.error(f"Error iniciando bot: {e}")
+        st.error(f"❌ Error inesperado: {e}")
         return False
 
 def stop_bot():
-    """Detiene el bot de trading"""
+    """Detiene el bot de trading usando el script de detención"""
     try:
-        # Buscar y detener proceso de paper_trading_main.py
-        found = False
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
-            try:
-                cmdline = proc.info.get('cmdline', [])
-                if cmdline and 'paper_trading_main.py' in ' '.join(cmdline):
-                    proc.terminate()
-                    try:
-                        proc.wait(timeout=10)
-                    except psutil.TimeoutExpired:
-                        proc.kill()
-                    found = True
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
-        return found
+        # Verificar si está corriendo
+        bot_running, _ = is_bot_running()
+        if not bot_running:
+            st.warning("⚠️ Bot no está corriendo")
+            return False
+        
+        # Ejecutar script de detención
+        script_path = os.path.join(os.getcwd(), "scripts", "stop_bot.sh")
+        
+        if not os.path.exists(script_path):
+            st.error(f"❌ Script de detención no encontrado: {script_path}")
+            return False
+        
+        # Ejecutar script
+        result = subprocess.run(
+            ["/bin/bash", script_path],
+            capture_output=True,
+            text=True,
+            timeout=15
+        )
+        
+        if result.returncode == 0:
+            st.success("✅ Bot detenido correctamente")
+            return True
+        else:
+            st.error(f"❌ Error al detener bot:\n{result.stderr}")
+            return False
+            
+    except subprocess.TimeoutExpired:
+        st.error("❌ Timeout al detener el bot")
+        return False
     except Exception as e:
-        st.error(f"Error deteniendo bot: {e}")
+        st.error(f"❌ Error inesperado: {e}")
         return False
 
 def check_service_status(url, timeout=3):

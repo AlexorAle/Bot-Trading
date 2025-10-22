@@ -73,3 +73,4 @@ reports/*.jpg
 *.tmp
 *.temp
 .cache/
+backtrader_engine/logs/*.pid
