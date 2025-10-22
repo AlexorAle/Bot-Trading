@@ -131,7 +131,7 @@ def is_bot_running():
 def get_metrics():
     """Obtiene métricas del bot desde Prometheus"""
     try:
-        response = requests.get("http://localhost:8080/metrics", timeout=5)
+        response = requests.get("http://127.0.0.1:8080/metrics", timeout=5)
         if response.status_code == 200:
             metrics = {}
             for line in response.text.split('\n'):
@@ -352,9 +352,9 @@ with col_right:
     
     # Servicios
     services = {
-        "Prometheus": ("http://localhost:9090", "📊"),
-        "Grafana": ("http://localhost:3000", "📈"),
-        "Metrics API": ("http://localhost:8080/metrics", "🔌")
+        "Prometheus": ("http://127.0.0.1:9090", "📊"),
+        "Grafana": ("http://127.0.0.1:3000", "📈"),
+        "Metrics API": ("http://127.0.0.1:8080/metrics", "🔌")
     }
     
     for service_name, (url, icon) in services.items():
