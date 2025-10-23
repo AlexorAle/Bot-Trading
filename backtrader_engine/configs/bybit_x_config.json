@@ -1,0 +1,76 @@
+{
+  "exchange": {
+    "name": "bybit",
+    "testnet": true,
+    "api_key": "RGsF3mGYBxloK5k2P8",
+    "api_secret": "5OujyPCj3i4gU0eCvFZJ1XAAX68YePJQrgd1",
+    "commission_rate": 0.0006,
+    "rate_limit": {
+      "requests_per_second": 10,
+      "requests_per_minute": 1200
+    }
+  },
+  "monitoring": {
+    "metrics_port": 8080,
+    "grafana_integration": true,
+    "prometheus_metrics": true
+  },
+  "backup": {
+    "enabled": true,
+    "interval_minutes": 30,
+    "max_backups": 72,
+    "backup_path": "backups/24h_trading/"
+  },
+  "alerts": {
+    "telegram": {
+      "enabled": true,
+      "bot_token": "7707298650:AAHvtK5f6w38dZa5rPYJyL3dCOabs7ifCo4",
+      "chat_id": "1316680506",
+      "min_interval": 1,
+      "max_message_length": 4096,
+      "include_timestamp": true
+    },
+    "signal_alerts": {
+      "enabled": true,
+      "min_confidence": 0.65,
+      "include_indicators": true
+    },
+    "trade_alerts": {
+      "enabled": true,
+      "include_pnl_details": true
+    },
+    "performance_alerts": {
+      "enabled": true,
+      "pnl_threshold_pct": 0.01,
+      "drawdown_threshold_pct": 0.02
+    },
+    "system_alerts": {
+      "enabled": true
+    }
+  },
+  "risk": {
+    "risk_limits": {
+      "max_position_size": 0.08,
+      "max_daily_trades": 15,
+      "max_daily_loss": 0.05,
+      "max_drawdown": 0.10,
+      "min_confidence": 0.65,
+      "max_volatility": 0.05,
+      "min_volume_ratio": 0.8,
+      "max_correlation": 0.7
+    },
+    "market_conditions": {
+      "suitable_regimes": ["trending", "ranging", "neutral"],
+      "volatility_thresholds": {
+        "low": 0.02,
+        "medium": 0.03,
+        "high": 0.05
+      },
+      "volume_thresholds": {
+        "min_ratio": 0.8,
+        "optimal_ratio": 1.2
+      }
+    }
+  }
+}
+

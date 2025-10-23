@@ -1,0 +1,51 @@
+{
+  "alerts": {
+    "enabled": true,
+    "max_history": 1000,
+    "rate_limits": {
+      "signal_generated": 60,
+      "signal_executed": 30,
+      "signal_rejected": 300,
+      "order_executed": 30,
+      "position_closed": 60,
+      "stop_loss": 0,
+      "take_profit": 0,
+      "pnl_update": 300,
+      "balance_update": 600,
+      "system_error": 0,
+      "connection_error": 60,
+      "bot_started": 0,
+      "bot_stopped": 0
+    }
+  },
+  "telegram": {
+    "enabled": true,
+    "bot_token": "7707298650:AAHvtK5f6w38dZa5rPYJyL3dCOabs7ifCo4",
+    "chat_id": "1316680506",
+    "min_interval": 1,
+    "max_message_length": 4096,
+    "include_timestamp": true
+  },
+  "notifications": {
+    "signal_alerts": {
+      "enabled": true,
+      "min_confidence": 0.7,
+      "include_indicators": true
+    },
+    "trading_alerts": {
+      "enabled": true,
+      "include_balance": true,
+      "include_pnl": true
+    },
+    "performance_alerts": {
+      "enabled": true,
+      "pnl_threshold": 0.01,
+      "drawdown_threshold": 0.05
+    },
+    "system_alerts": {
+      "enabled": true,
+      "include_errors": true,
+      "include_connection_issues": true
+    }
+  }
+}

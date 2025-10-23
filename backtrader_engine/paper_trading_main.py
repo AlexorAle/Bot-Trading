@@ -37,6 +37,10 @@ from alerting_system import global_alerting_system
 from prometheus_server import start_prometheus_server
 from backup_manager import global_backup_manager
 from disaster_recovery import global_disaster_recovery
+from compliance_manager import global_compliance_manager
+from documentation_generator import global_documentation_generator
+from audit_trail import global_audit_trail
+from regulatory_reporter import global_regulatory_reporter
 
 class VSTRUTradingBot:
     """
@@ -83,6 +87,12 @@ class VSTRUTradingBot:
         # Initialize Backup and Disaster Recovery
         self.backup_manager = global_backup_manager
         self.disaster_recovery = global_disaster_recovery
+        
+        # Initialize Compliance and Documentation
+        self.compliance_manager = global_compliance_manager
+        self.documentation_generator = global_documentation_generator
+        self.audit_trail = global_audit_trail
+        self.regulatory_reporter = global_regulatory_reporter
         
         # Connect alerting system to AlertManager
         if self.alert_manager:
@@ -249,9 +259,13 @@ class VSTRUTradingBot:
             monitoring_task = asyncio.create_task(self._monitoring_loop())
             logger.info("Monitoring loop task created")
             
-            # Start backup automation loop
-            backup_task = asyncio.create_task(self._backup_automation_loop())
-            logger.info("Backup automation loop task created")
+        # Start backup automation loop
+        backup_task = asyncio.create_task(self._backup_automation_loop())
+        logger.info("Backup automation loop task created")
+        
+        # Start compliance and documentation loop
+        compliance_task = asyncio.create_task(self._compliance_documentation_loop())
+        logger.info("Compliance and documentation loop task created")
             
             # Keep running indefinitely
             await vstru_task
@@ -351,6 +365,50 @@ class VSTRUTradingBot:
                 
             except Exception as e:
                 logger.error(f"Error in monitoring loop: {e}")
+                import traceback
+                traceback.print_exc()
+    
+    async def _compliance_documentation_loop(self):
+        """Loop de compliance y documentación - cada 24 horas"""
+        while self.running:
+            try:
+                await asyncio.sleep(86400)  # 24 horas
+                
+                if not self.running:
+                    break
+                
+                # Ejecutar verificaciones de compliance
+                try:
+                    compliance_checks = await self.compliance_manager.run_compliance_check()
+                    logger.info(f"Compliance checks completed: {len(compliance_checks)} checks")
+                except Exception as e:
+                    logger.error(f"Compliance checks failed: {e}")
+                
+                # Generar documentación automática
+                try:
+                    docs_result = await self.documentation_generator.generate_all_documentation()
+                    logger.info("Documentation generated successfully")
+                except Exception as e:
+                    logger.error(f"Documentation generation failed: {e}")
+                
+                # Generar reportes regulatorios
+                try:
+                    from datetime import datetime, timedelta
+                    end_time = datetime.now()
+                    start_time = end_time - timedelta(days=1)
+                    
+                    # Reporte de trades
+                    trade_report = await self.regulatory_reporter.generate_trade_report(
+                        framework=self.regulatory_reporter.RegulatoryFramework.MIFID_II,
+                        start_time=start_time,
+                        end_time=end_time
+                    )
+                    logger.info(f"Trade report generated: {trade_report.report_id}")
+                except Exception as e:
+                    logger.error(f"Regulatory reporting failed: {e}")
+                
+            except Exception as e:
+                logger.error(f"Error in compliance and documentation loop: {e}")
                 import traceback
                 traceback.print_exc()
     
