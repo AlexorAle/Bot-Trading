@@ -120,6 +120,7 @@ class BybitPaperTrader:
         self.position_callbacks: List[Callable] = []
         self.balance_callbacks: List[Callable] = []
         self.signal_callbacks: List[Callable] = []
+        self.state_callbacks: List[Callable] = []
         
         # Threading
         self.running = False
@@ -465,6 +466,9 @@ class BybitPaperTrader:
                 callback(trade)
             except Exception as e:
                 logger.error(f"Error in trade callback: {e}")
+        
+        # Notify state callbacks for trade executions
+        self._notify_state_callbacks('trade', trade)
     
     def _notify_position_callbacks(self, position: PaperPosition):
         """Notify position callbacks"""
@@ -473,6 +477,9 @@ class BybitPaperTrader:
                 callback(position)
             except Exception as e:
                 logger.error(f"Error in position callback: {e}")
+        
+        # Notify state callbacks for position changes
+        self._notify_state_callbacks('position', position)
     
     def _notify_balance_callbacks(self, balance: float):
         """Notify balance callbacks"""
@@ -481,6 +488,17 @@ class BybitPaperTrader:
                 callback(balance)
             except Exception as e:
                 logger.error(f"Error in balance callback: {e}")
+        
+        # Notify state callbacks for balance changes
+        self._notify_state_callbacks('balance', balance)
+    
+    def _notify_state_callbacks(self, event_type: str, data: Any):
+        """Notify state callbacks"""
+        for callback in self.state_callbacks:
+            try:
+                callback(event_type, data)
+            except Exception as e:
+                logger.error(f"Error in state callback: {e}")
     
     def add_order_callback(self, callback: Callable):
         """Add callback for order updates"""
@@ -501,6 +519,10 @@ class BybitPaperTrader:
     def add_signal_callback(self, callback: Callable):
         """Add callback for signal updates"""
         self.signal_callbacks.append(callback)
+    
+    def add_state_callback(self, callback: Callable):
+        """Add callback for state updates"""
+        self.state_callbacks.append(callback)
     
     def add_alert_notifier(self, notifier: Callable):
         """Add alert notifier (e.g., Telegram)"""

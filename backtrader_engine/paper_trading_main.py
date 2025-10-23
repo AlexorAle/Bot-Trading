@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 from exchanges.bybit_paper_trader import BybitPaperTrader
 from signal_engine import TradingSignal
 from alert_manager import AlertManager
+from state_manager import StateManager
 
 class VSTRUTradingBot:
     """
@@ -57,6 +58,10 @@ class VSTRUTradingBot:
         # Initialize AlertManager with Telegram
         self.alert_manager = self._init_alert_manager()
         
+        # Initialize StateManager for persistence
+        self.state_manager = StateManager("logs/bot_state.json")
+        self._load_previous_state()
+        
         logger.info("VSTRUTradingBot initialized")
         logger.info(f"Symbols: {self.symbols}")
         logger.info(f"Signal interval: {self.signal_interval}s (15 minutes)")
@@ -80,6 +85,46 @@ class VSTRUTradingBot:
         except Exception as e:
             logger.error(f"Error initializing AlertManager: {e}")
             return None
+    
+    def _load_previous_state(self):
+        """Load previous state from file"""
+        try:
+            previous_state = self.state_manager.load_state()
+            if previous_state:
+                self.state_manager.current_state = previous_state
+                logger.info(f"Previous state loaded - Balance: ${previous_state.balance:.2f}, Trades: {previous_state.total_trades}")
+                
+                # Restaurar contador de señales
+                self.signal_counter = previous_state.signals_generated
+                
+                # Iniciar auto-save
+                self.state_manager.start_auto_save()
+            else:
+                logger.info("No previous state found, starting fresh")
+        except Exception as e:
+            logger.error(f"Error loading previous state: {e}")
+    
+    def _on_state_change(self, event_type: str, data):
+        """Handle state changes from paper trader"""
+        try:
+            if event_type == 'balance':
+                self.state_manager.update_balance(data)
+            elif event_type == 'trade':
+                # data is a PaperTrade object
+                pnl = data.realized_pnl if hasattr(data, 'realized_pnl') else 0.0
+                self.state_manager.add_trade(pnl)
+            elif event_type == 'position':
+                # data is a PaperPosition object
+                position_data = {
+                    'symbol': data.symbol,
+                    'side': data.side,
+                    'size': data.size,
+                    'entry_price': data.entry_price,
+                    'unrealized_pnl': data.unrealized_pnl
+                }
+                self.state_manager.update_position(data.symbol, position_data)
+        except Exception as e:
+            logger.error(f"Error handling state change: {e}")
     
     def _load_config(self):
         """Load configuration from JSON"""
@@ -126,12 +171,19 @@ class VSTRUTradingBot:
             symbols = self.config.get('symbols', self.symbols)
             logger.info(f"Subscribing to: {symbols}")
             
+            # Connect state manager to paper trader
+            self.paper_trader.add_state_callback(self._on_state_change)
+            
             # Start paper trader with symbols (it will subscribe automatically)
             await self.paper_trader.start(symbols=symbols)
             
             logger.info("Bot started successfully")
             logger.info("VSTRU Strategy active - Signals every 15 minutes")
             logger.info("=" * 80)
+            
+            # Update state with start time
+            self.state_manager.current_state.start_time = datetime.now(timezone.utc).isoformat()
+            self.state_manager.save_state(force=True)
             
             # Send Telegram notification
             if self.alert_manager:
@@ -206,6 +258,9 @@ class VSTRUTradingBot:
             signal_type = 'BUY' if self.signal_counter % 2 == 0 else 'SELL'
             self.signal_counter += 1
             
+            # Update state with signal count
+            self.state_manager.update_signal_count()
+            
             # Create trading signal
             signal = TradingSignal(
                 symbol=symbol,
@@ -249,6 +304,9 @@ class VSTRUTradingBot:
         """Stop the bot"""
         logger.info("Stopping VSTRU bot...")
         self.running = False
+        
+        # Save final state before stopping
+        self.state_manager.emergency_save()
         
         # Send Telegram notification
         if self.alert_manager and self.start_time:
@@ -295,6 +353,8 @@ async def main():
     # Signal handlers for graceful shutdown
     def signal_handler(signum, frame):
         logger.info(f"Received signal {signum}, shutting down...")
+        # Emergency save before shutdown
+        bot.state_manager.emergency_save()
         asyncio.create_task(bot.stop())
     
     signal.signal(signal.SIGINT, signal_handler)
