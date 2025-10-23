@@ -74,3 +74,8 @@ reports/*.jpg
 *.temp
 .cache/
 backtrader_engine/logs/*.pid
+# Secrets and sensitive files
+.env
+*.secret
+configs/*_secret.json
+backtrader_engine/logs/*.log

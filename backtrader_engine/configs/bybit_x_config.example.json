@@ -1,0 +1,27 @@
+{
+  "exchange": {
+    "name": "bybit",
+    "testnet": true,
+    "api_key": "YOUR_BYBIT_API_KEY_HERE",
+    "api_secret": "YOUR_BYBIT_API_SECRET_HERE",
+    "commission_rate": 0.0006,
+    "rate_limit": {
+      "requests_per_second": 10,
+      "requests_per_minute": 120
+    }
+  },
+  "trading": {
+    "symbols": ["ETHUSDT", "BTCUSDT", "SOLUSDT"],
+    "timeframe": "1m",
+    "leverage": 1,
+    "risk_per_trade": 0.01,
+    "max_position_size": 0.1
+  },
+  "strategies": {
+    "vstru": {
+      "enabled": true,
+      "signal_interval": 900,
+      "confidence_threshold": 0.75
+    }
+  }
+}

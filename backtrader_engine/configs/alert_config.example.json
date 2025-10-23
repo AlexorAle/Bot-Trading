@@ -20,8 +20,8 @@
   },
   "telegram": {
     "enabled": true,
-    "bot_token": "7707298650:AAHvtK5f6w38dZa5rPYJyL3dCOabs7ifCo4",
-    "chat_id": "1316680506",
+    "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+    "chat_id": "YOUR_TELEGRAM_CHAT_ID_HERE",
     "min_interval": 1,
     "max_message_length": 4096,
     "include_timestamp": true
