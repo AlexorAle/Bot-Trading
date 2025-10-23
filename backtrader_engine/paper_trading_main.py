@@ -35,6 +35,8 @@ from health_checker import TradingBotHealthChecker
 from metrics_collector import global_metrics_collector
 from alerting_system import global_alerting_system
 from prometheus_server import start_prometheus_server
+from backup_manager import global_backup_manager
+from disaster_recovery import global_disaster_recovery
 
 class VSTRUTradingBot:
     """
@@ -77,6 +79,10 @@ class VSTRUTradingBot:
         self.metrics_collector = global_metrics_collector
         self.alerting_system = global_alerting_system
         self.prometheus_server = None
+        
+        # Initialize Backup and Disaster Recovery
+        self.backup_manager = global_backup_manager
+        self.disaster_recovery = global_disaster_recovery
         
         # Connect alerting system to AlertManager
         if self.alert_manager:
@@ -206,6 +212,22 @@ class VSTRUTradingBot:
             self.state_manager.current_state.start_time = datetime.now(timezone.utc).isoformat()
             self.state_manager.save_state(force=True)
             
+            # Create startup backup
+            try:
+                backup_id = await self.backup_manager.create_backup(
+                    BackupType.STATE_ONLY,
+                    f"Startup backup - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+                )
+                logger.info(f"Startup backup created: {backup_id}")
+            except Exception as e:
+                logger.error(f"Failed to create startup backup: {e}")
+            
+            # Run disaster recovery check
+            try:
+                await self.disaster_recovery.run_disaster_recovery_check()
+            except Exception as e:
+                logger.error(f"Disaster recovery check failed: {e}")
+            
             # Send Telegram notification
             if self.alert_manager:
                 config_info = f"Symbols: {', '.join(self.symbols)} | Signal interval: 15min"
@@ -226,6 +248,10 @@ class VSTRUTradingBot:
             # Start metrics and alerting loop
             monitoring_task = asyncio.create_task(self._monitoring_loop())
             logger.info("Monitoring loop task created")
+            
+            # Start backup automation loop
+            backup_task = asyncio.create_task(self._backup_automation_loop())
+            logger.info("Backup automation loop task created")
             
             # Keep running indefinitely
             await vstru_task
@@ -375,6 +401,36 @@ class VSTRUTradingBot:
             
         except Exception as e:
             logger.error(f"Error checking alerts: {e}")
+    
+    async def _backup_automation_loop(self):
+        """Loop de automatización de backups - cada 6 horas"""
+        while self.running:
+            try:
+                await asyncio.sleep(21600)  # 6 horas
+                
+                if not self.running:
+                    break
+                
+                # Crear backup automático
+                try:
+                    backup_id = await self.backup_manager.create_backup(
+                        BackupType.FULL,
+                        f"Automatic backup - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+                    )
+                    logger.info(f"Automatic backup created: {backup_id}")
+                except Exception as e:
+                    logger.error(f"Failed to create automatic backup: {e}")
+                
+                # Ejecutar disaster recovery check
+                try:
+                    await self.disaster_recovery.run_disaster_recovery_check()
+                except Exception as e:
+                    logger.error(f"Disaster recovery check failed: {e}")
+                
+            except Exception as e:
+                logger.error(f"Error in backup automation loop: {e}")
+                import traceback
+                traceback.print_exc()
     
     async def _send_alert_notification(self, alert):
         """Enviar notificación de alerta a través del AlertManager"""
