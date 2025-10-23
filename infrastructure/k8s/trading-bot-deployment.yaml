@@ -1,0 +1,154 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trading-bot
+  labels:
+    app: trading-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trading-bot
+  template:
+    metadata:
+      labels:
+        app: trading-bot
+    spec:
+      containers:
+      - name: trading-bot
+        image: trading-bot:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: EXCHANGE
+          value: "bybit"
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: api-key
+        - name: SECRET
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: secret
+        - name: SYMBOL
+          value: "BTCUSDT"
+        - name: TIMEFRAME
+          value: "5m"
+        - name: RISK_PER_TRADE
+          value: "0.01"
+        - name: LEVERAGE
+          value: "10"
+        - name: MODE
+          value: "paper"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: TELEGRAM_BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: telegram-bot-token
+        - name: TELEGRAM_CHAT_ID
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: telegram-chat-id
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: backups
+          mountPath: /app/backups
+        - name: configs
+          mountPath: /app/configs
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: trading-logs-pvc
+      - name: backups
+        persistentVolumeClaim:
+          claimName: trading-backups-pvc
+      - name: configs
+        configMap:
+          name: trading-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trading-bot-service
+spec:
+  selector:
+    app: trading-bot
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trading-config
+data:
+  alert_config.json: |
+    {
+      "alerts": {
+        "enabled": true,
+        "max_history": 1000
+      },
+      "telegram": {
+        "enabled": true,
+        "min_interval": 1
+      }
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: trading-secrets
+type: Opaque
+data:
+  api-key: UkdGczNtR1lCeGxva0s1azJQOA==  # base64 encoded
+  secret: NU9VankwUENqM2k0Z1UwZUN2RlpKMUFBWDY4WWVQSlFyZ2Qx  # base64 encoded
+  telegram-bot-token: NzcwNzI5ODY1MDpBQUh2dEs1ZjZ3MzhkWmE1clBZSnlMM2RDT2FiczdpZkNvNA==  # base64 encoded
+  telegram-chat-id: MTMxNjY4MDUwNg==  # base64 encoded
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: trading-logs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: trading-backups-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

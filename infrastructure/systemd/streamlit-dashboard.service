@@ -1,0 +1,32 @@
+[Unit]
+Description=Streamlit Dashboard Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=alex
+Group=alex
+WorkingDirectory=/home/alex/proyectos/bot-trading
+ExecStart=/home/alex/proyectos/bot-trading/venv/bin/streamlit run /home/alex/proyectos/bot-trading/streamlit_dashboard_modern.py --server.port=8501 --server.address=0.0.0.0
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=streamlit-dashboard
+
+# Environment variables
+Environment=PYTHONPATH=/home/alex/proyectos/bot-trading
+Environment=STREAMLIT_SERVER_PORT=8501
+Environment=STREAMLIT_SERVER_ADDRESS=0.0.0.0
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/alex/proyectos/bot-trading/logs
+
+[Install]
+WantedBy=multi-user.target

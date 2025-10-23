@@ -1,0 +1,42 @@
+[Unit]
+Description=Trading Bot Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=alex
+Group=alex
+WorkingDirectory=/home/alex/proyectos/bot-trading
+ExecStart=/home/alex/proyectos/bot-trading/venv/bin/python /home/alex/proyectos/bot-trading/backtrader_engine/paper_trading_main.py
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=trading-bot
+
+# Environment variables
+Environment=PYTHONPATH=/home/alex/proyectos/bot-trading
+Environment=EXCHANGE=bybit
+Environment=API_KEY=RGsF3mGYBxloK5k2P8
+Environment=SECRET=5OujyPCj3i4gU0eCvFZJ1XAAX68YePJQrgd1
+Environment=SYMBOL=BTCUSDT
+Environment=TIMEFRAME=5m
+Environment=RISK_PER_TRADE=0.01
+Environment=LEVERAGE=10
+Environment=MODE=paper
+Environment=LOG_LEVEL=INFO
+Environment=TELEGRAM_BOT_TOKEN=7707298650:AAHvtK5f6w38dZa5rPYJyL3dCOabs7ifCo4
+Environment=TELEGRAM_CHAT_ID=1316680506
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/alex/proyectos/bot-trading/logs
+ReadWritePaths=/home/alex/proyectos/bot-trading/backups
+
+[Install]
+WantedBy=multi-user.target

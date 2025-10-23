@@ -1,0 +1,69 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Trading Bot metrics
+  - job_name: 'trading-bot'
+    static_configs:
+      - targets: ['trading-bot:8080']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+
+  # Trading Bot health
+  - job_name: 'trading-bot-health'
+    static_configs:
+      - targets: ['trading-bot:8080']
+    scrape_interval: 30s
+    metrics_path: '/health'
+
+  # Streamlit Dashboard
+  - job_name: 'streamlit-dashboard'
+    static_configs:
+      - targets: ['streamlit-dashboard:8501']
+    scrape_interval: 60s
+
+  # Investment Dashboard Backend
+  - job_name: 'investment-backend'
+    static_configs:
+      - targets: ['investment-backend:8000']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+
+  # Investment Dashboard Frontend
+  - job_name: 'investment-frontend'
+    static_configs:
+      - targets: ['investment-frontend:3000']
+    scrape_interval: 60s
+
+  # Redis
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+
+  # PostgreSQL
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 30s
+
+  # Node Exporter (if available)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
