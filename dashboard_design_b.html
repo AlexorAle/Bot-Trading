@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center - Design B</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        /* Server Metrics - Compact Version */
+        .server-metrics-compact {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .server-metric-item {
+            text-align: center;
+        }
+
+        .server-metric-item .label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .server-metric-item .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Applications Grid */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+        }
+
+        .app-container {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 22px;
+            transition: all 0.3s ease;
+        }
+
+        .app-container:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .app-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-icon {
+            font-size: 1.8rem;
+        }
+
+        .app-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .app-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .app-status.online {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .app-status.offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-dot.pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Services Row */
+        .services-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .service-badge {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        .service-badge .icon {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .service-badge .name {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+        }
+
+        .service-badge .status {
+            font-size: 1rem;
+        }
+
+        /* Metrics Compact */
+        .metrics-compact {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .metric-compact {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .metric-compact .label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .metric-compact .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Controls Compact */
+        .controls-compact {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-compact {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-compact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-stop {
+            background: rgba(239, 68, 68, 0.8);
+            color: white;
+        }
+
+        .btn-restart {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Logs Toggle */
+        .logs-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logs-toggle:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .logs-toggle .title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logs-toggle .chevron {
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .logs-toggle .chevron.open {
+            transform: rotate(180deg);
+        }
+
+        .logs-content {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .logs-content.open {
+            display: block;
+        }
+
+        .log-line {
+            margin-bottom: 4px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .log-time {
+            color: #667eea;
+            font-size: 0.7rem;
+        }
+
+        /* Scrollbar styling */
+        .logs-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .logs-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        .logs-content::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 COMMAND CENTER</h1>
+        <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">Design Option B - Grid Layout</p>
+    </div>
+
+    <!-- Server Metrics Compact -->
+    <div class="server-metrics-compact">
+        <div class="server-metric-item">
+            <div class="label">CPU</div>
+            <div class="value">24%</div>
+        </div>
+        <div class="server-metric-item">
+            <div class="label">RAM</div>
+            <div class="value">58%</div>
+        </div>
+        <div class="server-metric-item">
+            <div class="label">Disk</div>
+            <div class="value">42%</div>
+        </div>
+        <div class="server-metric-item">
+            <div class="label">Network</div>
+            <div class="value">1.2 MB/s</div>
+        </div>
+        <div class="server-metric-item">
+            <div class="label">Uptime</div>
+            <div class="value">7d 14h</div>
+        </div>
+    </div>
+
+    <!-- Applications Grid -->
+    <div class="apps-grid">
+        <!-- Trading Bot App -->
+        <div class="app-container">
+            <div class="app-header-row">
+                <div class="app-title-group">
+                    <div class="app-icon">🤖</div>
+                    <div class="app-title">Trading Bot</div>
+                </div>
+                <div class="app-status online">
+                    <div class="status-dot pulse"></div>
+                    <span>ONLINE</span>
+                </div>
+            </div>
+
+            <!-- Services Row -->
+            <div class="services-row">
+                <div class="service-badge">
+                    <div class="icon">🔌</div>
+                    <div class="name">API</div>
+                    <div class="status">🟢</div>
+                </div>
+                <div class="service-badge">
+                    <div class="icon">📊</div>
+                    <div class="name">Prometheus</div>
+                    <div class="status">🟢</div>
+                </div>
+                <div class="service-badge">
+                    <div class="icon">📈</div>
+                    <div class="name">Grafana</div>
+                    <div class="status">🔴</div>
+                </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-compact">
+                <div class="metric-compact">
+                    <div class="label">📊 Señales</div>
+                    <div class="value">142</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">💎 ETH/USDT</div>
+                    <div class="value">$4,125</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">💰 Balance</div>
+                    <div class="value">$10,450</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">📈 P&L</div>
+                    <div class="value">+4.5%</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-compact">
+                <button class="btn-compact btn-stop">🛑 STOP</button>
+                <button class="btn-compact btn-restart">🔄 RESTART</button>
+                <button class="btn-compact btn-primary">📄 PAPER</button>
+            </div>
+
+            <!-- Logs -->
+            <div class="logs-toggle" onclick="toggleLogs('logs1')">
+                <div class="title">📋 Logs</div>
+                <div class="chevron" id="chevron1">▼</div>
+            </div>
+            <div class="logs-content" id="logs1">
+                <div class="log-line">
+                    <span class="log-time">[14:32:15]</span> Signal: BUY ETHUSDT @ $4,125.30
+                </div>
+                <div class="log-line">
+                    <span class="log-time">[14:31:42]</span> Processing ticker data
+                </div>
+                <div class="log-line">
+                    <span class="log-time">[14:31:10]</span> Network latency: 250ms
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment Dashboard App -->
+        <div class="app-container">
+            <div class="app-header-row">
+                <div class="app-title-group">
+                    <div class="app-icon">💼</div>
+                    <div class="app-title">Investment Dashboard</div>
+                </div>
+                <div class="app-status online">
+                    <div class="status-dot pulse"></div>
+                    <span>ONLINE</span>
+                </div>
+            </div>
+
+            <!-- Services Row -->
+            <div class="services-row">
+                <div class="service-badge">
+                    <div class="icon">🔧</div>
+                    <div class="name">Backend</div>
+                    <div class="status">🟢</div>
+                </div>
+                <div class="service-badge">
+                    <div class="icon">🌐</div>
+                    <div class="name">Frontend</div>
+                    <div class="status">🟢</div>
+                </div>
+                <div class="service-badge">
+                    <div class="icon">💾</div>
+                    <div class="name">Database</div>
+                    <div class="status">🟢</div>
+                </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-compact">
+                <div class="metric-compact">
+                    <div class="label">📊 Portfolios</div>
+                    <div class="value">8</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">💰 Total Value</div>
+                    <div class="value">$45.2K</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">📈 YTD Return</div>
+                    <div class="value">+12.3%</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">👥 Users</div>
+                    <div class="value">23</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-compact">
+                <button class="btn-compact btn-stop">🛑 STOP</button>
+                <button class="btn-compact btn-restart">🔄 RESTART</button>
+                <button class="btn-compact btn-primary">🌐 OPEN</button>
+            </div>
+
+            <!-- Logs -->
+            <div class="logs-toggle" onclick="toggleLogs('logs2')">
+                <div class="title">📋 Logs</div>
+                <div class="chevron" id="chevron2">▼</div>
+            </div>
+            <div class="logs-content" id="logs2">
+                <div class="log-line">
+                    <span class="log-time">[14:30:45]</span> User login: admin@example.com
+                </div>
+                <div class="log-line">
+                    <span class="log-time">[14:28:12]</span> Portfolio updated: Tech Growth
+                </div>
+                <div class="log-line">
+                    <span class="log-time">[14:25:33]</span> Database backup completed
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Platform App -->
+        <div class="app-container">
+            <div class="app-header-row">
+                <div class="app-title-group">
+                    <div class="app-icon">📊</div>
+                    <div class="app-title">Analytics Platform</div>
+                </div>
+                <div class="app-status online">
+                    <div class="status-dot pulse"></div>
+                    <span>ONLINE</span>
+                </div>
+            </div>
+
+            <!-- Services Row -->
+            <div class="services-row">
+                <div class="service-badge">
+                    <div class="icon">⚡</div>
+                    <div class="name">Engine</div>
+                    <div class="status">🟢</div>
+                </div>
+                <div class="service-badge">
+                    <div class="icon">📡</div>
+                    <div class="name">Collector</div>
+                    <div class="status">🟢</div>
+                </div>
+                <div class="service-badge">
+                    <div class="icon">🔍</div>
+                    <div class="name">Query API</div>
+                    <div class="status">🟢</div>
+                </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-compact">
+                <div class="metric-compact">
+                    <div class="label">📊 Reports</div>
+                    <div class="value">1,245</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">⚡ Queries/min</div>
+                    <div class="value">328</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">💾 Data Size</div>
+                    <div class="value">2.4 GB</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">⏱️ Avg Time</div>
+                    <div class="value">145ms</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-compact">
+                <button class="btn-compact btn-stop">🛑 STOP</button>
+                <button class="btn-compact btn-restart">🔄 RESTART</button>
+                <button class="btn-compact btn-primary">📈 VIEW</button>
+            </div>
+
+            <!-- Logs -->
+            <div class="logs-toggle" onclick="toggleLogs('logs3')">
+                <div class="title">📋 Logs</div>
+                <div class="chevron" id="chevron3">▼</div>
+            </div>
+            <div class="logs-content" id="logs3">
+                <div class="log-line">
+                    <span class="log-time">[14:32:01]</span> Report generated: Monthly Summary
+                </div>
+                <div class="log-line">
+                    <span class="log-time">[14:29:15]</span> Data aggregation completed
+                </div>
+                <div class="log-line">
+                    <span class="log-time">[14:27:48]</span> Cache cleared: 245MB freed
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert System App -->
+        <div class="app-container">
+            <div class="app-header-row">
+                <div class="app-title-group">
+                    <div class="app-icon">🔔</div>
+                    <div class="app-title">Alert System</div>
+                </div>
+                <div class="app-status offline">
+                    <div class="status-dot"></div>
+                    <span>OFFLINE</span>
+                </div>
+            </div>
+
+            <!-- Services Row -->
+            <div class="services-row">
+                <div class="service-badge">
+                    <div class="icon">📧</div>
+                    <div class="name">Email</div>
+                    <div class="status">🔴</div>
+                </div>
+                <div class="service-badge">
+                    <div class="icon">💬</div>
+                    <div class="name">Telegram</div>
+                    <div class="status">🔴</div>
+                </div>
+                <div class="service-badge">
+                    <div class="icon">🔔</div>
+                    <div class="name">Webhook</div>
+                    <div class="status">🔴</div>
+                </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-compact">
+                <div class="metric-compact">
+                    <div class="label">📊 Today</div>
+                    <div class="value">0</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">📈 This Week</div>
+                    <div class="value">0</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">⚠️ Critical</div>
+                    <div class="value">0</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="label">✅ Success Rate</div>
+                    <div class="value">--</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-compact">
+                <button class="btn-compact btn-primary">▶️ START</button>
+                <button class="btn-compact btn-restart">🔄 RESTART</button>
+                <button class="btn-compact btn-restart">⚙️ CONFIG</button>
+            </div>
+
+            <!-- Logs -->
+            <div class="logs-toggle" onclick="toggleLogs('logs4')">
+                <div class="title">📋 Logs</div>
+                <div class="chevron" id="chevron4">▼</div>
+            </div>
+            <div class="logs-content" id="logs4">
+                <div class="log-line">
+                    <span class="log-time">[14:10:25]</span> Service stopped by user
+                </div>
+                <div class="log-line">
+                    <span class="log-time">[14:10:20]</span> Graceful shutdown initiated
+                </div>
+                <div class="log-line">
+                    <span class="log-time">[14:10:15]</span> All alerts cleared
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleLogs(logsId) {
+            const logsContent = document.getElementById(logsId);
+            const chevronId = 'chevron' + logsId.replace('logs', '');
+            const chevron = document.getElementById(chevronId);
+            
+            logsContent.classList.toggle('open');
+            chevron.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
