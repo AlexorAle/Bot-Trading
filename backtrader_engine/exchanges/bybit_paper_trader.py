@@ -21,6 +21,7 @@ from signal_engine import SignalEngine, TradingSignal
 from indicators_realtime import RealtimeIndicators
 from alert_manager import AlertManager
 from risk_manager import RiskManager
+from error_handler import global_error_handler, with_error_handling, ErrorCategory
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +122,9 @@ class BybitPaperTrader:
         self.balance_callbacks: List[Callable] = []
         self.signal_callbacks: List[Callable] = []
         self.state_callbacks: List[Callable] = []
+        
+        # Error handling
+        self.error_handler = global_error_handler
         
         # Threading
         self.running = False
@@ -528,6 +532,7 @@ class BybitPaperTrader:
         """Add alert notifier (e.g., Telegram)"""
         self.alert_manager.add_notifier(notifier)
     
+    @with_error_handling(circuit_breaker_name="paper_trader_startup", category=ErrorCategory.SYSTEM)
     async def start(self, symbols: List[str] = None):
         """Start paper trading engine"""
         if self.running:

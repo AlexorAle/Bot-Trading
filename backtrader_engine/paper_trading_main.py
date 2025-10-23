@@ -30,6 +30,8 @@ from exchanges.bybit_paper_trader import BybitPaperTrader
 from signal_engine import TradingSignal
 from alert_manager import AlertManager
 from state_manager import StateManager
+from error_handler import global_error_handler, with_error_handling, ErrorCategory
+from health_checker import TradingBotHealthChecker
 
 class VSTRUTradingBot:
     """
@@ -61,6 +63,12 @@ class VSTRUTradingBot:
         # Initialize StateManager for persistence
         self.state_manager = StateManager("logs/bot_state.json")
         self._load_previous_state()
+        
+        # Initialize Error Handler
+        self.error_handler = global_error_handler
+        
+        # Initialize Health Checker
+        self.health_checker = TradingBotHealthChecker(self)
         
         logger.info("VSTRUTradingBot initialized")
         logger.info(f"Symbols: {self.symbols}")
@@ -137,6 +145,7 @@ class VSTRUTradingBot:
             logger.error(f"Error loading config: {e}")
             sys.exit(1)
     
+    @with_error_handling(circuit_breaker_name="bot_startup", category=ErrorCategory.SYSTEM)
     async def start(self):
         """Start the VSTRU trading bot"""
         try:
@@ -194,6 +203,10 @@ class VSTRUTradingBot:
             vstru_task = asyncio.create_task(self._vstru_signal_loop())
             logger.info("VSTRU signal loop task created")
             
+            # Start health check loop in parallel
+            health_task = asyncio.create_task(self._health_check_loop())
+            logger.info("Health check loop task created")
+            
             # Keep running indefinitely
             await vstru_task
             
@@ -241,6 +254,41 @@ class VSTRUTradingBot:
                 import traceback
                 traceback.print_exc()
     
+    async def _health_check_loop(self):
+        """Health check loop - runs every 5 minutes"""
+        while self.running:
+            try:
+                await asyncio.sleep(300)  # 5 minutes
+                
+                if not self.running:
+                    break
+                
+                # Run health checks
+                health_results = await self.health_checker.run_all_checks()
+                overall_status = self.health_checker.get_overall_status()
+                
+                # Log health status
+                if overall_status.value == "critical":
+                    logger.critical(f"HEALTH CHECK CRITICAL: {len([r for r in health_results.values() if r.status.value == 'critical'])} critical issues")
+                elif overall_status.value == "warning":
+                    logger.warning(f"HEALTH CHECK WARNING: {len([r for r in health_results.values() if r.status.value == 'warning'])} warnings")
+                else:
+                    logger.info(f"Health check OK: {overall_status.value}")
+                
+                # Send alert if critical
+                if overall_status.value == "critical" and self.alert_manager:
+                    critical_issues = [r for r in health_results.values() if r.status.value == "critical"]
+                    alert_msg = f"🚨 CRITICAL HEALTH ISSUES DETECTED:\n"
+                    for issue in critical_issues:
+                        alert_msg += f"• {issue.name}: {issue.message}\n"
+                    self.alert_manager.send_alert("system_error", alert_msg)
+                
+            except Exception as e:
+                logger.error(f"Error in health check loop: {e}")
+                import traceback
+                traceback.print_exc()
+    
+    @with_error_handling(circuit_breaker_name="signal_generation", category=ErrorCategory.TRADING)
     async def _generate_vstru_signal(self, symbol: str):
         """
         Generate VSTRU signal for symbol

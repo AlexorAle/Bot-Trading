@@ -6,7 +6,13 @@ import time
 from datetime import datetime
 import psutil
 import pandas as pd
+import asyncio
+import sys
+from pathlib import Path
 from investment_manager import investment_manager
+
+# Add backtrader_engine to path for health checks
+sys.path.append(str(Path(__file__).parent / "backtrader_engine"))
 
 # Configuración de página con tema oscuro
 st.set_page_config(
@@ -550,6 +556,26 @@ with main_col_right:
             st.info("No logs available for Investment Frontend")
     
 
+
+def get_bot_health_status():
+    """Obtener estado de salud del bot"""
+    try:
+        from health_endpoint import get_bot_health_status
+        
+        # Ejecutar función async en un nuevo loop
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            health_status = loop.run_until_complete(get_bot_health_status())
+            return health_status
+        finally:
+            loop.close()
+    except Exception as e:
+        return {
+            'status': 'error',
+            'overall_status': 'unknown',
+            'error': str(e)
+        }
 
 # Footer
 st.markdown("<br><br>", unsafe_allow_html=True)
