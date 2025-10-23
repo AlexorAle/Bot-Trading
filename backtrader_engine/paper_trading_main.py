@@ -32,6 +32,9 @@ from alert_manager import AlertManager
 from state_manager import StateManager
 from error_handler import global_error_handler, with_error_handling, ErrorCategory
 from health_checker import TradingBotHealthChecker
+from metrics_collector import global_metrics_collector
+from alerting_system import global_alerting_system
+from prometheus_server import start_prometheus_server
 
 class VSTRUTradingBot:
     """
@@ -69,6 +72,15 @@ class VSTRUTradingBot:
         
         # Initialize Health Checker
         self.health_checker = TradingBotHealthChecker(self)
+        
+        # Initialize Metrics and Alerting
+        self.metrics_collector = global_metrics_collector
+        self.alerting_system = global_alerting_system
+        self.prometheus_server = None
+        
+        # Connect alerting system to AlertManager
+        if self.alert_manager:
+            self.alerting_system.add_notifier(self._send_alert_notification)
         
         logger.info("VSTRUTradingBot initialized")
         logger.info(f"Symbols: {self.symbols}")
@@ -207,6 +219,14 @@ class VSTRUTradingBot:
             health_task = asyncio.create_task(self._health_check_loop())
             logger.info("Health check loop task created")
             
+            # Start Prometheus server
+            self.prometheus_server, prometheus_runner = await start_prometheus_server()
+            logger.info("Prometheus server started")
+            
+            # Start metrics and alerting loop
+            monitoring_task = asyncio.create_task(self._monitoring_loop())
+            logger.info("Monitoring loop task created")
+            
             # Keep running indefinitely
             await vstru_task
             
@@ -288,6 +308,93 @@ class VSTRUTradingBot:
                 import traceback
                 traceback.print_exc()
     
+    async def _monitoring_loop(self):
+        """Loop de monitoreo - métricas y alertas cada 30 segundos"""
+        while self.running:
+            try:
+                await asyncio.sleep(30)  # 30 segundos
+                
+                if not self.running:
+                    break
+                
+                # Actualizar métricas del bot
+                self._update_bot_metrics()
+                
+                # Verificar alertas
+                await self._check_alerts()
+                
+            except Exception as e:
+                logger.error(f"Error in monitoring loop: {e}")
+                import traceback
+                traceback.print_exc()
+    
+    def _update_bot_metrics(self):
+        """Actualizar métricas del bot"""
+        try:
+            # Métricas básicas del bot
+            self.metrics_collector.update_bot_status(
+                running=self.running,
+                uptime=time.time() - self.start_time if self.start_time else 0
+            )
+            
+            # Métricas de sistema
+            import psutil
+            process = psutil.Process()
+            memory_info = process.memory_info()
+            cpu_percent = process.cpu_percent()
+            
+            self.metrics_collector.update_system_metrics(
+                memory_bytes=memory_info.rss,
+                cpu_percent=cpu_percent
+            )
+            
+            # Métricas de WebSocket
+            if self.paper_trader and hasattr(self.paper_trader, 'websocket'):
+                websocket_connected = self.paper_trader.websocket.connected if self.paper_trader.websocket else False
+                self.metrics_collector.update_websocket_status(websocket_connected)
+            
+            # Métricas de trading
+            if self.paper_trader:
+                self.metrics_collector.update_balance(self.paper_trader.balance)
+            
+            # Métricas de señales
+            self.metrics_collector.set_gauge("trading_signals_total", self.signal_counter)
+            
+        except Exception as e:
+            logger.error(f"Error updating metrics: {e}")
+    
+    async def _check_alerts(self):
+        """Verificar alertas"""
+        try:
+            # Obtener métricas actuales
+            metrics = self.metrics_collector.get_all_metrics()
+            metrics_dict = {name: {"value": metric.value, "labels": metric.labels} for name, metric in metrics.items()}
+            
+            # Verificar reglas de alerta
+            await self.alerting_system.check_alerts(metrics_dict)
+            
+        except Exception as e:
+            logger.error(f"Error checking alerts: {e}")
+    
+    async def _send_alert_notification(self, alert):
+        """Enviar notificación de alerta a través del AlertManager"""
+        try:
+            if self.alert_manager:
+                # Formatear mensaje de alerta
+                alert_message = f"{alert.title}\n{alert.message}"
+                
+                # Enviar según severidad
+                if alert.severity.value == "critical":
+                    self.alert_manager.send_alert("system_error", alert_message)
+                elif alert.severity.value == "warning":
+                    self.alert_manager.send_alert("system_warning", alert_message)
+                else:
+                    self.alert_manager.send_alert("system_info", alert_message)
+                
+                logger.info(f"Alert notification sent: {alert.title}")
+        except Exception as e:
+            logger.error(f"Error sending alert notification: {e}")
+    
     @with_error_handling(circuit_breaker_name="signal_generation", category=ErrorCategory.TRADING)
     async def _generate_vstru_signal(self, symbol: str):
         """
@@ -308,6 +415,9 @@ class VSTRUTradingBot:
             
             # Update state with signal count
             self.state_manager.update_signal_count()
+            
+            # Record signal in metrics
+            self.metrics_collector.record_signal("vstru")
             
             # Create trading signal
             signal = TradingSignal(
